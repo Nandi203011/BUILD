@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from backend.cv_extraction.raw_types import RawLine, RawTextItem
+from backend.cv_extraction.scale_note import ScaleNote, detect_scale_notes, nearest_scale_note
 from backend.schemas.geometry import BoundingBox
 from backend.schemas.independent_measurements import IndependentCVResult, IndependentMeasurement
 
@@ -111,32 +112,96 @@ def _coverage(interval_start: float, interval_end: float, segments: list[tuple[f
     return total
 
 
+# Upper bound on distinct horizontal/vertical axis positions carried into
+# rectangle enumeration. Rectangle search is quadratic in each axis, so an
+# unbounded axis list makes cost quartic in the number of lines: a dense
+# working drawing (or the raster fallback, where every hatching stroke
+# becomes a segment) can push this from milliseconds to minutes. When the
+# cap binds, the axis lines with the longest total drawn extent are kept --
+# plot and building boundaries are among the longest lines in their region,
+# while noise is short.
+_MAX_AXIS_POSITIONS = 60
+
+# Minimum side length (page-points) for a reconstructed rectangle, and the
+# fraction of each side that must actually be drawn for it to count.
+_MIN_RECT_SIDE_PTS = 45.0
+_MIN_SIDE_COVERAGE = 0.82
+_MAX_RECT_ASPECT = 8.0
+_AXIS_SNAP_TOLERANCE_PTS = 2.0
+
+
+def _dominant_axis_positions(
+    grouped: list[tuple[float, float, float]], limit: int = _MAX_AXIS_POSITIONS
+) -> list[float]:
+    """
+    Distinct axis positions from `(position, start, end)` segments, capped at
+    `limit` and ranked by total drawn extent at that position.
+
+    Architectural sheets redraw the same edge several times with sub-point
+    coordinate noise, so positions are first snapped to 0.1pt.
+    """
+    extent_by_position: dict[float, float] = {}
+    for position, start, end in grouped:
+        key = round(position, 1)
+        extent_by_position[key] = extent_by_position.get(key, 0.0) + max(0.0, end - start)
+    if len(extent_by_position) <= limit:
+        return sorted(extent_by_position)
+    strongest = sorted(extent_by_position.items(), key=lambda kv: kv[1], reverse=True)[:limit]
+    return sorted(position for position, _extent in strongest)
+
+
 def _rectangles_from_lines(lines: list[RawLine], region: BoundingBox) -> list[_Rect]:
     hs, vs = _cluster_lines(lines, region)
     # Keep only strong, distinct axis lines.  Architectural drawing sheets
     # often repeat the same edge several times with tiny coordinate noise.
-    ys = sorted({round(y, 1) for y, _, _ in hs})
-    xs = sorted({round(x, 1) for x, _, _ in vs})
+    ys = _dominant_axis_positions(hs)
+    xs = _dominant_axis_positions(vs)
+
+    # Bucket segments by snapped axis position once, instead of rescanning
+    # every segment inside the innermost loop.
+    h_segments: dict[float, list[tuple[float, float]]] = {y: [] for y in ys}
+    for y, a, b in hs:
+        for candidate in ys:
+            if abs(y - candidate) <= _AXIS_SNAP_TOLERANCE_PTS:
+                h_segments[candidate].append((a, b))
+    v_segments: dict[float, list[tuple[float, float]]] = {x: [] for x in xs}
+    for x, a, b in vs:
+        for candidate in xs:
+            if abs(x - candidate) <= _AXIS_SNAP_TOLERANCE_PTS:
+                v_segments[candidate].append((a, b))
+
     rects: list[_Rect] = []
-    for x0 in xs:
-        for x1 in xs:
-            if x1 - x0 < 45:
+    for i, x0 in enumerate(xs):
+        for x1 in xs[i + 1:]:
+            width = x1 - x0
+            if width < _MIN_RECT_SIDE_PTS:
                 continue
-            for y0 in ys:
-                for y1 in ys:
-                    if y1 - y0 < 45:
+            # Horizontal lines that actually span this x-range. Computing
+            # this once per x-pair (rather than once per x-pair AND y-pair)
+            # is what removes the quartic term: the surviving `spanning_ys`
+            # list is typically a handful of entries even when `ys` is long.
+            spanning_ys = [
+                y for y in ys
+                if _coverage(x0, x1, h_segments[y]) >= _MIN_SIDE_COVERAGE * width
+            ]
+            if len(spanning_ys) < 2:
+                continue
+            for j, y0 in enumerate(spanning_ys):
+                for y1 in spanning_ys[j + 1:]:
+                    height = y1 - y0
+                    if height < _MIN_RECT_SIDE_PTS:
                         continue
-                    bbox = BoundingBox(min_x=x0, min_y=y0, max_x=x1, max_y=y1)
-                    if bbox.width / max(bbox.height, 1e-6) > 8 or bbox.height / max(bbox.width, 1e-6) > 8:
+                    if max(width / height, height / width) > _MAX_RECT_ASPECT:
                         continue
-                    top = _coverage(x0, x1, [(a, b) for y, a, b in hs if abs(y - y0) <= 2.0])
-                    bottom = _coverage(x0, x1, [(a, b) for y, a, b in hs if abs(y - y1) <= 2.0])
-                    left = _coverage(y0, y1, [(a, b) for x, a, b in vs if abs(x - x0) <= 2.0])
-                    right = _coverage(y0, y1, [(a, b) for x, a, b in vs if abs(x - x1) <= 2.0])
-                    w, h = bbox.width, bbox.height
-                    if min(top, bottom) < 0.82 * w or min(left, right) < 0.82 * h:
+                    left = _coverage(y0, y1, v_segments[x0])
+                    if left < _MIN_SIDE_COVERAGE * height:
                         continue
-                    rects.append(_Rect(bbox))
+                    right = _coverage(y0, y1, v_segments[x1])
+                    if right < _MIN_SIDE_COVERAGE * height:
+                        continue
+                    rects.append(
+                        _Rect(BoundingBox(min_x=x0, min_y=y0, max_x=x1, max_y=y1))
+                    )
     # Deduplicate nearly identical rectangles.
     unique: list[_Rect] = []
     for r in sorted(rects, key=lambda x: x.area, reverse=True):
@@ -161,17 +226,41 @@ def _find_site_anchor(text_items: list[RawTextItem]) -> RawTextItem | None:
     return max(matches, key=lambda t: (len(t.text), -t.bounding_box.min_y))
 
 
+# The site-plan search window, expressed as fractions of the sheet's own
+# dimensions rather than absolute page-points.
+#
+# These were absolute constants (+-420pt horizontally, -470/+140pt
+# vertically). Absolute point offsets encode an assumption about sheet size
+# that does not survive contact with real drawings: the same offsets cover
+# most of an A3 sheet but a small corner of an A0 one. On the 2384x1684pt
+# (A1) sheets in `data/test_plans/` the +-420pt horizontal window reached
+# 400pt to the RIGHT of the "SITE PLAN" caption, straight into the
+# terms-and-conditions text column, which is how numbered legal clauses
+# ("46.Due to non-compliance...") ended up being scored as plot-edge
+# dimension labels.
+_REGION_HALF_WIDTH_FRACTION = 0.18
+_REGION_ABOVE_FRACTION = 0.30
+_REGION_BELOW_FRACTION = 0.06
+
+
 def _site_region(anchor: RawTextItem, page_width: float, page_height: float) -> BoundingBox:
+    """
+    A search window around the "SITE PLAN" caption, sized relative to the
+    sheet.
+
+    The caption is printed directly beneath its drawing, so the window
+    extends much further up than down. It is deliberately only a bound on
+    the rectangle search -- which candidate rectangle is actually the plot
+    is decided afterwards by agreement with the sheet's own area statement
+    (`_score_rects`), not by this window.
+    """
     c = anchor.bounding_box.center
-    # Site-plan labels are normally below/alongside the drawing.  Use a
-    # generous local window rather than the whole sheet, which is exactly
-    # what prevents floor-plan walls and title blocks from becoming CV
-    # candidates for this validation.
+    half_width = page_width * _REGION_HALF_WIDTH_FRACTION
     return BoundingBox(
-        min_x=max(0.0, c.x - 420.0),
-        min_y=max(0.0, c.y - 470.0),
-        max_x=min(page_width, c.x + 420.0),
-        max_y=min(page_height, c.y + 140.0),
+        min_x=max(0.0, c.x - half_width),
+        min_y=max(0.0, c.y - page_height * _REGION_ABOVE_FRACTION),
+        max_x=min(page_width, c.x + half_width),
+        max_y=min(page_height, c.y + page_height * _REGION_BELOW_FRACTION),
     )
 
 
@@ -263,12 +352,26 @@ def _pick_edge_dimension(nums, outer: BoundingBox, orientation: str, road_text_b
     return candidates[0][1:] if candidates else None
 
 
-def _pick_gap_dimension(nums, outer: BoundingBox, inner: BoundingBox, side: str):
+def _pick_gap_dimension(
+    nums, outer: BoundingBox, inner: BoundingBox, side: str, max_setback_m: float | None = None
+):
+    """
+    Find the printed setback label sitting in the plot/building gap on `side`.
+
+    `max_setback_m` bounds what counts as a plausible setback reading. This
+    used to be a hardcoded `value > 3.0` cut, on the reasoning that "setback
+    labels on normal urban plans are small". That is not a property of
+    setbacks, it is a property of small plots: BBMP's own setback table
+    requires 6m+ front setbacks once a plot exceeds roughly 24m of depth, so
+    the constant silently discarded every correct reading on a larger plot.
+    Callers now derive the bound from the plot's own measured geometry --
+    a setback cannot exceed the gap it is annotating.
+    """
     candidates = []
     for value, item, unit in nums:
         c = item.bounding_box.center
-        if value > 3.0:
-            continue  # setback labels on normal urban plans are small; large labels are plot/building dims.
+        if max_setback_m is not None and value > max_setback_m:
+            continue
         if side == "top" and outer.min_y <= c.y <= inner.min_y and outer.min_x <= c.x <= outer.max_x:
             distance = abs(c.y - (outer.min_y + inner.min_y) / 2)
         elif side == "bottom" and inner.max_y <= c.y <= outer.max_y and outer.min_x <= c.x <= outer.max_x:
@@ -286,7 +389,13 @@ def _pick_gap_dimension(nums, outer: BoundingBox, inner: BoundingBox, side: str)
 
 _AREA_LABELS = [
     ("plot.area", re.compile(r"^AREA\s+OF\s+PLOT\s*\(\s*Minimum\s*\)", re.I), "m2"),
-    ("plot.area", re.compile(r"^NET\s+AREA\s+OF\s+PLOT", re.I), "m2"),
+    # The NET plot area (gross minus any road-widening deduction) is a
+    # DIFFERENT physical quantity bounded by a DIFFERENT rectangle on the
+    # drawing, so it gets its own field. Both used to be emitted as
+    # "plot.area", which meant a sheet stating both (the common case on a
+    # BBMP sanctioned plan) produced two contradictory values for one field
+    # and whichever was consumed last silently won.
+    ("plot.net_area", re.compile(r"^NET\s+AREA\s+OF\s+PLOT", re.I), "m2"),
     ("building.footprint_area", re.compile(r"^PROPOSED\s+COVERAGE\s+AREA", re.I), "m2"),
     ("coverage", re.compile(r"^PROPOSED\s+COVERAGE\s+AREA", re.I), "%"),
     ("far.area", re.compile(r"^PROPOSED\s+FAR\s+AREA", re.I), "m2"),
@@ -295,6 +404,82 @@ _AREA_LABELS = [
     ("building.gross_built_up_area", re.compile(r"^PROPOSED\s+BUILTUP\s+AREA", re.I), "m2"),
 ]
 _NUM_ITEM_RE = re.compile(r"(?<![A-Za-z])(?:\d+(?:\.\d+)?|\.\d+)(?![A-Za-z])")
+
+# Area-statement labels used to CROSS-CHECK reconstructed geometry, keyed by
+# what the value physically bounds. Distinct from `_AREA_LABELS` above, which
+# reports areas as measurements in their own right: here both the gross and
+# the net plot area matter separately, because they correspond to two
+# different rectangles on the drawing (the plot boundary, and the plot
+# boundary minus a road-widening strip).
+_AREA_TARGET_LABELS = [
+    ("plot_area_gross", re.compile(r"^AREA\s+OF\s+PLOT\s*\(\s*Minimum\s*\)", re.I)),
+    ("plot_area_net", re.compile(r"^NET\s+AREA\s+OF\s+PLOT", re.I)),
+    ("building_footprint_area", re.compile(r"^PROPOSED\s+COVERAGE\s+AREA", re.I)),
+]
+
+
+def _area_targets(text_items: list[RawTextItem]) -> dict[str, float]:
+    """
+    The sheet's own stated plot/coverage areas, in square metres.
+
+    These are the closed-loop check that makes geometry reconstruction
+    trustworthy without any printed edge dimension: a candidate rectangle
+    measured at the sheet's printed scale either reproduces the sheet's
+    stated area or it does not. On the plans in `data/test_plans/` the
+    correct rectangle matches to within 0.2%, while the dozens of competing
+    dimension frames, hatching boxes and title blocks do not come close.
+    """
+    ordered = sorted(text_items, key=lambda t: (t.bounding_box.min_y, t.bounding_box.min_x))
+    targets: dict[str, float] = {}
+    for key, pattern in _AREA_TARGET_LABELS:
+        if key in targets:
+            continue
+        for label_item in ordered:
+            if not pattern.search((label_item.text or "").strip()):
+                continue
+            numeric_item = _nearest_numeric_item(label_item, ordered)
+            if numeric_item is None:
+                continue
+            try:
+                value = float(numeric_item.text.strip())
+            except ValueError:
+                continue
+            if value > 0:
+                targets[key] = value
+            break
+    return targets
+
+
+# A reconstructed rectangle counts as reproducing a stated area when it is
+# within this relative tolerance. Vector line coordinates and the printed
+# scale are both exact, so real agreement is well inside 1%; the allowance
+# covers line-weight offsets on where an edge's centreline actually sits.
+_AREA_MATCH_TOLERANCE = 0.03
+
+
+def _area_agreement(rect: _Rect, target_m2: float, points_per_metre: float) -> float | None:
+    """Relative error between a rectangle's real-world area and `target_m2`."""
+    if points_per_metre is None or points_per_metre <= 0 or target_m2 <= 0:
+        return None
+    area_m2 = (rect.width / points_per_metre) * (rect.height / points_per_metre)
+    return abs(area_m2 - target_m2) / target_m2
+
+
+def _best_rect_for_area(
+    rects: list[_Rect], target_m2: float | None, points_per_metre: float | None
+) -> tuple[_Rect, float] | None:
+    """The rectangle whose scaled area best reproduces `target_m2`, if any does."""
+    if target_m2 is None or points_per_metre is None or points_per_metre <= 0:
+        return None
+    scored = []
+    for rect in rects:
+        error = _area_agreement(rect, target_m2, points_per_metre)
+        if error is not None and error <= _AREA_MATCH_TOLERANCE:
+            scored.append((error, rect))
+    if not scored:
+        return None
+    error, rect = min(scored, key=lambda pair: pair[0])
+    return rect, error
 
 
 def _nearest_numeric_item(label_item: RawTextItem, items: list[RawTextItem]) -> RawTextItem | None:
@@ -387,6 +572,147 @@ def _measurement(field: str, value: float | None, source: str | None, confidence
     )
 
 
+# The scale a drawing states in print and the scale implied by its own
+# dimension labels must agree; if they disagree by more than this, something
+# is wrong (mis-read label, wrong note associated with the view) and neither
+# is asserted confidently.
+_SCALE_AGREEMENT_TOLERANCE = 0.05
+
+# A setback cannot be larger than the plot side it is measured across. Used
+# to bound plausible setback readings in place of a hardcoded metre value.
+_MAX_SETBACK_AS_PLOT_FRACTION = 0.5
+
+# Physical bounds on a single plot side, in metres. Any candidate rectangle
+# that scales outside this is not a plot boundary -- it is a detail view, a
+# title block, a legend box, or the same drawing read at the wrong scale.
+# The lower bound in particular is what stops a detail-view scale note (a
+# sheet may print 1:25, 1:50, 1:75 and 1:100 side by side) from being applied
+# to the site plan: at 1:25 a 10m plot measures 0.94m, which is rejected here.
+_MIN_PLOT_SIDE_M = 3.0
+_MAX_PLOT_SIDE_M = 200.0
+
+# An explicit edge label is only believed when it agrees with the same edge
+# measured off the geometry at the resolved scale. This is what prevents a
+# nearby non-dimension number from being adopted as a plot dimension: on a
+# real sheet a rotated "SITE NO-09" caption sits exactly where a depth label
+# would, and was read as plot.depth = 9.0 m on a plot 13.10 m deep.
+_EDGE_LABEL_AGREEMENT_TOLERANCE = 0.06
+
+# How far a nested rectangle's edge may fall OUTSIDE its parent's before it
+# stops counting as nested. Non-zero only to absorb line-weight: a boundary
+# drawn with a wide stroke puts the two centrelines a fraction of a point
+# apart even where the building genuinely abuts the plot line.
+_NESTED_EDGE_TOLERANCE_PTS = 1.5
+
+
+def _distinct_scale_notes(notes: list[ScaleNote], region_centre) -> list[ScaleNote | None]:
+    """
+    The distinct scales worth trying for a drawing region, best guess first,
+    always ending with `None` (meaning "no printed scale -- fall back to
+    edge-label-derived scale only").
+
+    Notes are deduplicated by denominator, because the same scale printed
+    under several views is one hypothesis, not several. Ordering is by
+    whether the note carried the literal word "scale" and then by distance
+    to the region, which only breaks ties: the actual choice is made by
+    scoring each hypothesis against the drawing in `extract_site_plan_measurements`.
+    """
+    by_denominator: dict[int, ScaleNote] = {}
+    for note in notes:
+        existing = by_denominator.get(note.denominator)
+        if existing is None or (
+            (not existing.has_scale_keyword, existing.distance_to(region_centre))
+            > (not note.has_scale_keyword, note.distance_to(region_centre))
+        ):
+            by_denominator[note.denominator] = note
+    ordered = sorted(
+        by_denominator.values(),
+        key=lambda n: (not n.has_scale_keyword, n.distance_to(region_centre)),
+    )
+    return [*ordered, None]
+
+
+def _plausible_plot_rect(rect: _Rect, points_per_metre: float | None) -> bool:
+    """Whether `rect` could physically be a plot boundary at this scale."""
+    if points_per_metre is None or points_per_metre <= 0:
+        return True  # no scale to judge by; other signals must decide
+    width_m = rect.width / points_per_metre
+    depth_m = rect.height / points_per_metre
+    return all(_MIN_PLOT_SIDE_M <= side <= _MAX_PLOT_SIDE_M for side in (width_m, depth_m))
+
+
+def _label_agrees_with_geometry(
+    label_value_m: float | None, side_pts: float, points_per_metre: float | None
+) -> bool:
+    """Whether an explicit edge label matches that edge measured at `points_per_metre`."""
+    if label_value_m is None or points_per_metre is None or points_per_metre <= 0:
+        return False
+    measured_m = side_pts / points_per_metre
+    if measured_m <= 0:
+        return False
+    return abs(label_value_m - measured_m) / measured_m <= _EDGE_LABEL_AGREEMENT_TOLERANCE
+
+
+def _resolve_scale(
+    label_samples: list[float], printed: ScaleNote | None
+) -> tuple[float | None, float | None, str]:
+    """
+    Reconcile the two independent statements of a drawing's scale.
+
+    Returns `(points_per_metre, confidence, explanation)`.
+
+    Priority is deliberate. When printed and label-derived scales AGREE they
+    corroborate each other and the result is the most trustworthy value the
+    resolver can produce. When only one exists it is used on its own. When
+    both exist and DISAGREE, the printed note wins -- it is an exact
+    statement by the drafting software, whereas a label-derived sample
+    depends on having correctly associated a number with an edge, which is
+    exactly the association this module is trying to establish.
+    """
+    label_scale = sum(label_samples) / len(label_samples) if label_samples else None
+
+    if printed is not None and label_scale is not None:
+        disagreement = abs(printed.points_per_metre - label_scale) / printed.points_per_metre
+        if disagreement <= _SCALE_AGREEMENT_TOLERANCE:
+            return (
+                printed.points_per_metre,
+                0.99,
+                f"printed drawing scale 1:{printed.denominator} "
+                f"({printed.points_per_metre:.4f} pt/m) corroborated by edge-label-derived "
+                f"scale ({label_scale:.4f} pt/m, {disagreement:.2%} apart)",
+            )
+        return (
+            printed.points_per_metre,
+            0.80,
+            f"printed drawing scale 1:{printed.denominator} "
+            f"({printed.points_per_metre:.4f} pt/m) used, but the edge-label-derived scale "
+            f"({label_scale:.4f} pt/m) disagrees by {disagreement:.2%} -- confidence reduced",
+        )
+
+    if printed is not None:
+        return (
+            printed.points_per_metre,
+            0.95,
+            f"printed drawing scale 1:{printed.denominator} "
+            f"({printed.points_per_metre:.4f} pt/m); no edge dimension label available to "
+            "corroborate it",
+        )
+
+    if label_scale is not None:
+        consistent = (
+            len(label_samples) == 2
+            and abs(label_samples[0] - label_samples[1]) / label_scale < 0.02
+        )
+        return (
+            label_scale,
+            0.99 if consistent else 0.80,
+            f"scale derived from {len(label_samples)} explicit edge dimension label(s); "
+            "no printed scale note found on the sheet",
+        )
+
+    return None, None, "no printed scale note and no explicit edge dimension label"
+
+
 def extract_site_plan_measurements(
     text_items: list[RawTextItem],
     lines: list[RawLine],
@@ -394,6 +720,7 @@ def extract_site_plan_measurements(
     page_number: int,
     page_width: float,
     page_height: float,
+    scale_notes: list[ScaleNote] | None = None,
 ) -> tuple[list[IndependentMeasurement], BoundingBox | None, float | None, float | None, list[str]]:
     notes: list[str] = []
     anchor = _find_site_anchor(text_items)
@@ -414,6 +741,24 @@ def extract_site_plan_measurements(
 
     nums = _numbers_in_region(text_items, region)
 
+    # The sheet's printed scale for THIS view, and the areas it states for
+    # itself. Together these let geometry be resolved on a drawing that
+    # carries no printed edge dimensions at all -- the common case that
+    # previously produced null plot/building/setback values on 4 of the 5
+    # bundled test plans.
+    area_targets = _area_targets(text_items)
+    plot_area_target = area_targets.get("plot_area_gross") or area_targets.get("plot_area_net")
+
+    # A sheet may print several scales, one per drawing view (PLAN4 carries
+    # 1:25, 1:50, 1:75 and 1:100). Which one governs the site plan cannot be
+    # decided from the note's position alone -- captions crowd together in a
+    # title block. So scale and plot rectangle are chosen JOINTLY: every
+    # (scale note, candidate rectangle) pairing is scored, and the pairing
+    # that best reproduces the sheet's stated plot area -- while staying
+    # physically plausible -- wins. Proximity is retained only as a
+    # tie-breaker.
+    candidate_notes = _distinct_scale_notes(scale_notes or [], region.center)
+
     # Select the plot from geometry + explicit edge dimensions, not by raw
     # area.  This is the key fix for architectural sheets containing many
     # unrelated rectangles/dimension frames around the actual site plan.
@@ -431,7 +776,11 @@ def extract_site_plan_measurements(
         if region.intersects(item.bounding_box) and _ROAD_VALUE_RE.search(item.text or "")
     ]
     scored_rects = []
-    for candidate in substantial:
+    for printed_scale in candidate_notes:
+      scale_pts_per_m = printed_scale.points_per_metre if printed_scale else None
+      for candidate in substantial:
+        if not _plausible_plot_rect(candidate, scale_pts_per_m):
+            continue
         wd = _pick_edge_dimension(nums, candidate.bbox, "horizontal", road_text_boxes)
         dd = _pick_edge_dimension(nums, candidate.bbox, "vertical", road_text_boxes)
         nested_for_candidate = []
@@ -445,13 +794,49 @@ def extract_site_plan_measurements(
                 r.bbox.min_y - candidate.bbox.min_y,
                 candidate.bbox.max_y - r.bbox.max_y,
             ]
-            if 0.45 <= ratio <= 0.98 and min(gaps) >= 2.0:
+            # `min(gaps) >= -_NESTED_EDGE_TOLERANCE_PTS`, not `>= 2.0`.
+            # Requiring a positive gap on all four sides assumes the building
+            # never touches the plot boundary. Zero-setback construction is
+            # the norm on small urban Indian plots, and on the sample plan
+            # (GBA_BSCC_0748_25-26.pdf) the building footprint shares its
+            # left edge with the plot boundary exactly -- so the real
+            # footprint was excluded here, and building.width/depth plus all
+            # four setbacks came back null on a plot whose geometry had in
+            # fact been reconstructed correctly.
+            if 0.45 <= ratio <= 0.98 and min(gaps) >= -_NESTED_EDGE_TOLERANCE_PTS:
                 nested_for_candidate.append(r)
         score = 0.0
-        if wd and 5.0 <= wd[0] <= 60.0:
+
+        # An edge label only counts in favour of this rectangle when it
+        # agrees with that same edge measured at this scale. Without the
+        # agreement check any nearby number scored as confirmation, which is
+        # how a rotated "SITE NO-09" caption printed alongside the plot was
+        # credited as a 9.0 m depth dimension.
+        width_label_ok = bool(wd) and (
+            _label_agrees_with_geometry(wd[0], candidate.width, scale_pts_per_m)
+            if scale_pts_per_m else 5.0 <= wd[0] <= 60.0
+        )
+        depth_label_ok = bool(dd) and (
+            _label_agrees_with_geometry(dd[0], candidate.height, scale_pts_per_m)
+            if scale_pts_per_m else 5.0 <= dd[0] <= 60.0
+        )
+        if width_label_ok:
             score += 4.0
-        if dd and 5.0 <= dd[0] <= 60.0:
+        if depth_label_ok:
             score += 4.0
+
+        # Agreement with the sheet's own stated plot area, measured at the
+        # printed scale. This is the strongest single signal available: it
+        # is a closed loop between two independent parts of the document
+        # (the drawing's vector geometry, and the area statement's text),
+        # neither of which was used to produce the other. It is weighted
+        # above the edge-label bonuses precisely because it still works on
+        # a drawing with no edge labels.
+        if scale_pts_per_m is not None and plot_area_target is not None:
+            error = _area_agreement(candidate, plot_area_target, scale_pts_per_m)
+            if error is not None and error <= _AREA_MATCH_TOLERANCE:
+                score += 10.0 * (1.0 - error / _AREA_MATCH_TOLERANCE)
+
         if nested_for_candidate:
             score += 3.0
             inner_probe = max(nested_for_candidate, key=lambda r: r.area)
@@ -476,58 +861,136 @@ def extract_site_plan_measurements(
         if any(candidate.bbox.intersects(rb) for rb in road_text_boxes):
             score -= 4.0
         score += min(1.0, candidate.area / max(r.area for r in substantial))
-        scored_rects.append((score, candidate, wd, dd, nested_for_candidate))
+        scored_rects.append(
+            (score, candidate, wd if width_label_ok else None,
+             dd if depth_label_ok else None, nested_for_candidate, printed_scale)
+        )
+
+    if not scored_rects:
+        notes.append(
+            f"{len(substantial)} candidate rectangle(s) were reconstructed near the site-plan "
+            f"anchor, but none is a physically plausible plot ({_MIN_PLOT_SIDE_M}-"
+            f"{_MAX_PLOT_SIDE_M} m per side) under any scale the sheet states "
+            f"({[n.denominator for n in candidate_notes if n]}). Nothing is asserted."
+        )
+        return [], region, None, None, notes
 
     scored_rects.sort(key=lambda x: (x[0], x[1].area), reverse=True)
-    _score, outer, width_dim, depth_dim, nested = scored_rects[0]
-    inner = max(nested, key=lambda r: r.area) if nested else None
+    _score, outer, width_dim, depth_dim, nested, printed_scale = scored_rects[0]
+
+    # Whether ANYTHING independent of the geometry itself confirms that this
+    # rectangle is the plot boundary at this scale.
+    #
+    # Without this gate, "the best-scoring rectangle near a SITE PLAN
+    # caption" is asserted as the plot even on a sheet that contains no site
+    # plan at all. PLAN4 is exactly that sheet -- floor plans, a foundation
+    # detail, a staircase detail and a percolation pit, no plot boundary
+    # anywhere -- and it produced a confident 3.76 x 3.61 m "plot" from a
+    # construction-detail box read at a detail view's 1:100 note. A wrong
+    # number presented as a measurement is worse than a missing one here,
+    # because the compliance engine downstream treats MISSING as
+    # INSUFFICIENT_DATA (correct) but treats a value as fact.
+    area_confirmed = (
+        scale_for_winner := (printed_scale.points_per_metre if printed_scale else None)
+    ) is not None and plot_area_target is not None and (
+        (err := _area_agreement(outer, plot_area_target, scale_for_winner)) is not None
+        and err <= _AREA_MATCH_TOLERANCE
+    )
+    label_confirmed = width_dim is not None or depth_dim is not None
     # Avoid accidentally choosing a nearby 1.00/0.80 label if the dimension
     # text is not clearly outside the outer boundary.
     if width_dim is None or width_dim[0] < 2.0:
         width_dim = None
     if depth_dim is None or depth_dim[0] < 2.0:
         depth_dim = None
-    if width_dim is None and depth_dim is None:
+
+    plot_w = width_dim[0] if width_dim else None
+    plot_d = depth_dim[0] if depth_dim else None
+
+    label_samples = []
+    if plot_w and outer.width > 0:
+        label_samples.append(outer.width / plot_w)
+    if plot_d and outer.height > 0:
+        label_samples.append(outer.height / plot_d)
+    scale, scale_conf, scale_reason = _resolve_scale(label_samples, printed_scale)
+    notes.append(f"scale: {scale_reason}.")
+
+    if not (area_confirmed or label_confirmed):
+        notes.append(
+            f"the best-scoring rectangle near the site-plan anchor "
+            f"({len(substantial)} considered, score={_score:.1f}) is confirmed by NEITHER an "
+            "edge dimension label that agrees with its geometry NOR the sheet's stated plot "
+            f"area (stated area available: {plot_area_target is not None}). Plot dimensions are "
+            "left unresolved rather than asserted from an unconfirmed rectangle -- a sheet with "
+            "no site plan on it will always contain some best-scoring rectangle."
+        )
+
+    if plot_w is None and plot_d is None and scale is None:
         notes.append(
             f"picked a candidate rectangle ({len(substantial)} candidate(s) considered near the "
             f"site-plan anchor, score={_score:.1f}), but found NO numeric label within range on "
-            "either its horizontal or vertical edges (see `_pick_edge_dimension`'s distance/"
-            "overlap/road-exclusion checks) -- plot.width and plot.depth cannot be resolved. "
-            "Since scale (pt/m) is derived from plot.width/plot.depth, this also blocks "
-            "building.width/depth and all 4 setbacks even if a nested building rectangle exists."
-        )
-    elif width_dim is None or depth_dim is None:
-        missing_side = "horizontal (plot.width)" if width_dim is None else "vertical (plot.depth)"
-        notes.append(
-            f"picked a candidate rectangle and found one edge dimension, but the {missing_side} "
-            "edge had no matching numeric label within range -- that field stays MISSING, and "
-            "since scale needs BOTH plot.width and plot.depth, it could not be computed either "
-            "(blocking building.width/depth and all 4 setbacks even though one plot dimension "
-            "was found)."
+            "either its horizontal or vertical edges AND no printed scale note -- plot.width and "
+            "plot.depth cannot be resolved, which also blocks building.width/depth and all 4 "
+            "setbacks even if a nested building rectangle exists."
         )
 
     measurements: list[IndependentMeasurement] = []
-    plot_w = width_dim[0] if width_dim else None
-    plot_d = depth_dim[0] if depth_dim else None
     if plot_w is not None:
         measurements.append(_measurement("plot.width", plot_w, "NATIVE_TEXT", 0.99, [width_dim[1].text.strip()], "Explicit site-plan width label anchored to outer plot rectangle.", page_number, outer.bbox))
+    elif scale and (area_confirmed or label_confirmed):
+        # No printed edge label for THIS side, but the rectangle is confirmed
+        # as the plot by the sheet's own area statement (or by the other
+        # side's label), and the scale is established -- so measure it.
+        # Lower confidence than a printed label, and marked VECTOR_GEOMETRY
+        # so downstream reconciliation can tell the two apart.
+        plot_w = outer.width / scale
+        measurements.append(_measurement("plot.width", plot_w, "VECTOR_GEOMETRY", 0.92, [f"outer rectangle width {outer.width:.2f} pt", scale_reason], "Plot width measured from the site-plan boundary rectangle at the drawing's resolved scale; no printed edge label was present.", page_number, outer.bbox))
     if plot_d is not None:
         measurements.append(_measurement("plot.depth", plot_d, "NATIVE_TEXT", 0.99, [depth_dim[1].text.strip()], "Explicit site-plan depth label anchored to outer plot rectangle.", page_number, outer.bbox))
+    elif scale and (area_confirmed or label_confirmed):
+        plot_d = outer.height / scale
+        measurements.append(_measurement("plot.depth", plot_d, "VECTOR_GEOMETRY", 0.92, [f"outer rectangle height {outer.height:.2f} pt", scale_reason], "Plot depth measured from the site-plan boundary rectangle at the drawing's resolved scale; no printed edge label was present.", page_number, outer.bbox))
 
-    scale_samples = []
-    if plot_w and outer.width > 0: scale_samples.append(outer.width / plot_w)
-    if plot_d and outer.height > 0: scale_samples.append(outer.height / plot_d)
-    scale = sum(scale_samples) / len(scale_samples) if scale_samples else None
-    scale_conf = 0.99 if len(scale_samples) == 2 and abs(scale_samples[0]-scale_samples[1])/scale < 0.02 else (0.8 if scale else None)
+    # The building footprint: prefer the nested rectangle that reproduces the
+    # sheet's stated coverage area, falling back to the largest nested one.
+    inner = None
+    inner_note = ""
+    footprint_match = _best_rect_for_area(
+        nested, area_targets.get("building_footprint_area"), scale
+    )
+    if footprint_match is not None:
+        inner, footprint_error = footprint_match
+        inner_note = (
+            f"footprint rectangle reproduces the sheet's stated coverage area "
+            f"({area_targets['building_footprint_area']} sq.m) to within {footprint_error:.2%}"
+        )
+    elif nested:
+        inner = max(nested, key=lambda r: r.area)
+        inner_note = "largest rectangle nested inside the plot boundary (no stated coverage area to confirm it against)"
 
-    if inner is not None and scale:
+    # Everything below is measured relative to the plot rectangle, so it
+    # inherits that rectangle's confirmation status. A nested rectangle that
+    # independently reproduces the sheet's stated coverage area is itself a
+    # confirmation, so it counts too.
+    nest_confirmed = area_confirmed or label_confirmed or footprint_match is not None
+    if inner is not None and scale and nest_confirmed:
         b_w = inner.width / scale
         b_d = inner.height / scale
-        measurements.append(_measurement("building.width", b_w, "VECTOR_GEOMETRY", 0.97, [f"inner rectangle width {inner.width:.2f} pt", f"outer scale {scale:.3f} pt/m"], "Building width derived from the nested building footprint geometry and site-plan scale; no Vision input.", page_number, inner.bbox))
-        measurements.append(_measurement("building.depth", b_d, "VECTOR_GEOMETRY", 0.97, [f"inner rectangle height {inner.height:.2f} pt", f"outer scale {scale:.3f} pt/m"], "Building depth derived from the nested building footprint geometry and site-plan scale; no Vision input.", page_number, inner.bbox))
+        measurements.append(_measurement("building.width", b_w, "VECTOR_GEOMETRY", 0.97, [f"inner rectangle width {inner.width:.2f} pt", f"scale {scale:.3f} pt/m", inner_note], "Building width derived from the nested building footprint geometry and site-plan scale; no Vision input.", page_number, inner.bbox))
+        measurements.append(_measurement("building.depth", b_d, "VECTOR_GEOMETRY", 0.97, [f"inner rectangle height {inner.height:.2f} pt", f"scale {scale:.3f} pt/m", inner_note], "Building depth derived from the nested building footprint geometry and site-plan scale; no Vision input.", page_number, inner.bbox))
+
+        # A setback is bounded by the plot side it crosses; anything larger
+        # is a plot/building dimension that wandered into the gap.
+        plot_short_side_m = min(
+            plot_w if plot_w else float("inf"), plot_d if plot_d else float("inf")
+        )
+        max_setback_m = (
+            plot_short_side_m * _MAX_SETBACK_AS_PLOT_FRACTION
+            if plot_short_side_m != float("inf") else None
+        )
 
         for side, label in (("top", "setbacks.rear"), ("bottom", "setbacks.front"), ("left", "setbacks.left"), ("right", "setbacks.right")):
-            picked = _pick_gap_dimension(nums, outer.bbox, inner.bbox, side)
+            picked = _pick_gap_dimension(nums, outer.bbox, inner.bbox, side, max_setback_m)
             if picked:
                 val, item = picked
                 measurements.append(_measurement(label, val, "NATIVE_TEXT", 0.99, [item.text.strip()], f"Explicit setback label spatially located in the {side} plot/building gap.", page_number, outer.bbox))
@@ -539,8 +1002,16 @@ def extract_site_plan_measurements(
                 elif side == "bottom": gap = (outer.bbox.max_y - inner.bbox.max_y) / scale
                 elif side == "left": gap = (inner.bbox.min_x - outer.bbox.min_x) / scale
                 else: gap = (outer.bbox.max_x - inner.bbox.max_x) / scale
-                if 0 <= gap <= 5:
+                if 0 <= gap <= (max_setback_m if max_setback_m is not None else 5.0):
                     measurements.append(_measurement(label, gap, "DERIVED", 0.88, [f"{side} geometric gap"], f"No explicit label was associated; setback derived from nested rectangles. Marked lower confidence.", page_number, outer.bbox))
+    elif inner is not None and scale and not nest_confirmed:
+        notes.append(
+            "a nested rectangle was found inside the winning outer candidate, but the outer "
+            "candidate is not confirmed as the plot boundary (see above) and the nested one "
+            "does not reproduce any stated coverage area -- building.width/depth and the "
+            "setbacks are therefore left unresolved rather than derived from an unverified "
+            "pair of rectangles."
+        )
     elif inner is None and scale:
         notes.append(
             "plot.width/depth resolved and scale computed, but no nested (building footprint) "
@@ -591,8 +1062,10 @@ def extract_independent_cv(document_path, document_id: str) -> IndependentCVResu
                     text_items = ocr_fallback.ocr_page(image, page_number, dpi=200.0)
                 except Exception as exc:
                     warnings.append(f"page {page_number+1}: OCR fallback failed: {exc}")
+            page_scale_notes = detect_scale_notes(text_items, page_number)
             measurements, bbox, page_scale, page_scale_conf, notes = extract_site_plan_measurements(
-                text_items, lines, page_number=page_number, page_width=meta.width_pts, page_height=meta.height_pts
+                text_items, lines, page_number=page_number, page_width=meta.width_pts,
+                page_height=meta.height_pts, scale_notes=page_scale_notes,
             )
             for n in notes:
                 warnings.append(f"page {page_number+1}: {n}")
@@ -606,7 +1079,8 @@ def extract_independent_cv(document_path, document_id: str) -> IndependentCVResu
                     cv_evidence = opencv_geometry.geometry_evidence_for_page(image, page_number, dpi=200.0)
                     measurements, bbox, page_scale, page_scale_conf, raster_notes = extract_site_plan_measurements(
                         text_items, cv_evidence["lines"], page_number=page_number,
-                        page_width=meta.width_pts, page_height=meta.height_pts
+                        page_width=meta.width_pts, page_height=meta.height_pts,
+                        scale_notes=detect_scale_notes(text_items, page_number),
                     )
                     for n in raster_notes:
                         warnings.append(f"page {page_number+1} (raster fallback): {n}")
@@ -618,10 +1092,19 @@ def extract_independent_cv(document_path, document_id: str) -> IndependentCVResu
             if measurements:
                 pages.append(page_number + 1)
                 all_measurements.extend(measurements)
-                site_page = page_number + 1
-                site_bbox = bbox
-                scale = page_scale
-                scale_conf = page_scale_conf
+                # Only a page that actually resolved site-plan GEOMETRY may
+                # claim to be the site-plan page. Previously every page with
+                # any measurement overwrote these, so on a multi-page set a
+                # later page carrying nothing but an area-statement table
+                # (bbox=None, scale=None) silently erased the real site
+                # page's resolved bounding box and scale.
+                if bbox is not None and page_scale is not None:
+                    site_page = page_number + 1
+                    site_bbox = bbox
+                    scale = page_scale
+                    scale_conf = page_scale_conf
+                elif site_page is None:
+                    site_page = page_number + 1
     finally:
         doc.close()
     if not all_measurements:

@@ -209,9 +209,18 @@ def test_plan2_full_document_verified_fusion_matches_acceptance_values():
     out = build_document_verified_fusion(cv_result, None, pdf_path=str(pdf_path))
     fav = out["final_agreed_values"]
 
+    # building.width/depth moved by ~0.05% (10.5952 -> 10.5904,
+    # 16.4822 -> 16.4747) when scale resolution began preferring the sheet's
+    # PRINTED "Scale 1:200" note (exactly 14.17323 pt/m) over a scale inferred
+    # from PLAN2's own edge labels (14.16676 pt/m). The printed note is the
+    # more accurate of the two, and the sheet itself says so: the footprint
+    # measured at the printed scale reproduces PLAN2's stated coverage area
+    # (174.52 sq.m) to within 0.027%, against 0.064% for the label-derived
+    # scale. The plot dimensions are unchanged because they still come from
+    # explicit printed labels, not from geometry.
     expected = {
         "plot.width": 12.192, "plot.depth": 18.28,
-        "building.width": 10.5952, "building.depth": 16.4822,
+        "building.width": 10.5904, "building.depth": 16.4747,
         "setbacks.front": 1.0, "setbacks.rear": 0.8, "setbacks.left": 0.8, "setbacks.right": 0.8,
         "road.width": 9.2, "plot.area": 222.83, "building.footprint_area": 174.52,
         "coverage": 78.32, "far.area": 386.55, "far": 1.73, "building.gross_built_up_area": 579.90,

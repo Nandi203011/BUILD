@@ -31,6 +31,89 @@ _NUMERIC_UNIT_RE = re.compile(
     re.IGNORECASE,
 )
 
+# --------------------------------------------------------------------------
+# Dimension-text plausibility gate
+#
+# Before this gate existed, `detect_dimension_candidates` accepted ANY text
+# span containing a digit. On a real BBMP sanctioned sheet
+# (GBA_BSCC_0748_25-26.pdf / PLAN6) that produced 366 "dimensions" from 748
+# text spans, of which 361 had no resolvable unit and 242 were nevertheless
+# associated with a real geometry line. `scale.estimate_scale` then divided
+# genuine page-point line lengths by things like a legal clause number, a
+# ward number, or a PID:
+#
+#     mag=3910264701.0  'PID No. (As per Khata Extract): 3910264701'
+#     mag=2015.0        'Permissible F.A.R. as per zoning regulation 2015 ( 1.75 )'
+#     mag=46.0          '46.Due to non-compliance of safety precautionary measures...'
+#     mag=187.0         'Ward: Ward 187'
+#     mag=1.0           'ISO_A1_(841.00_x_594.00_MM)'
+#
+# The resulting scale estimate resolved plot.width to 40.64 m on a plot whose
+# real width is 10.00 m -- and reported it at MEDIUM confidence, because the
+# poisoned samples agreed with each other. Filtering the input is strictly
+# more effective than trying to make the robust median downstream survive a
+# majority of garbage samples.
+#
+# The gate is deliberately conservative in one direction only: it may drop a
+# real dimension (which surfaces as MISSING, an honest outcome under the
+# project's evidence contract), but it must not admit prose.
+
+# A drawing's dimension annotation is short. Anything longer is a sentence,
+# a table row, or a title-block field.
+_MAX_DIMENSION_TEXT_CHARS = 32
+
+# "46.Due to non-compliance", "3.Car Parking reserved in the plan ...".
+# Numbered-clause prose is the single largest source of false dimensions on
+# a sanctioned plan, because the sheet carries 40+ printed conditions.
+_CLAUSE_PROSE_RE = re.compile(r"^\s*\d+\s*[.)]\s*[A-Za-z]")
+
+# A bare number with no unit and no decimal point that is far too large to be
+# a length in any unit an architectural sheet uses. Survey numbers, PIDs,
+# years, project numbers and ward numbers all land here.
+_MAX_UNITLESS_MAGNITUDE = 1000.0
+
+# Words that legitimately appear inside a dimension annotation, and so must
+# not count towards the "this is prose" letter budget below.
+_DIMENSION_WORD_RE = re.compile(
+    r"\b(road|wide|widening|setback|set\s*-?back|plot|site|building|width|depth|"
+    r"length|clear|ht|height|dia|mtr|mts|metre|meter|feet|foot|inch|sq|smt|"
+    r"mm|cm|m|ft|in)\b",
+    re.I,
+)
+
+# Letters left over after removing digits, punctuation and the vocabulary
+# above. Four or more means we are looking at words, not an annotation.
+_MAX_RESIDUAL_LETTERS = 3
+
+
+def looks_like_dimension_text(text: str) -> bool:
+    """
+    True when `text` plausibly IS a printed dimension annotation, as opposed
+    to prose, a table row, an identifier, or a title-block field that merely
+    happens to contain digits.
+
+    This is a text-shape test only. It says nothing about what the dimension
+    MEANS (that is `spatial_reasoning.dimension_classification`'s job) and
+    nothing about whether the value is correct.
+    """
+    t = (text or "").strip()
+    if not t:
+        return False
+    if len(t) > _MAX_DIMENSION_TEXT_CHARS:
+        return False
+    if _CLAUSE_PROSE_RE.match(t):
+        return False
+
+    # Strip the dimension vocabulary, then digits/units/punctuation, and see
+    # how much alphabetic text is left standing.
+    residual = _DIMENSION_WORD_RE.sub(" ", t)
+    residual = re.sub(r"[\d\s.,;:/()\[\]{}<>~=+*&%@#$^_|\\'\"\u00d7xX-]", "", residual)
+    if len(residual) > _MAX_RESIDUAL_LETTERS:
+        return False
+
+    return True
+
+
 _UNIT_NORMALIZATION = {
     "mm": "mm",
     "cm": "cm",
@@ -105,6 +188,11 @@ def detect_dimension_candidates(
         text = item.text.strip()
         if not text:
             continue
+        if not looks_like_dimension_text(text):
+            # Prose, table rows, identifiers and title-block fields are not
+            # dimensions no matter how many digits they contain. See
+            # `looks_like_dimension_text` for why this gate is load-bearing.
+            continue
 
         fi_match = _FEET_INCHES_RE.search(text)
         if fi_match:
@@ -132,6 +220,10 @@ def detect_dimension_candidates(
         except ValueError:
             continue
         unit = _normalize_unit(num_match.group("unit"))
+        if unit is None and value > _MAX_UNITLESS_MAGNITUDE:
+            # A bare number this large is a survey/PID/project number or a
+            # year, not a length in mm, cm, m, ft or in.
+            continue
         candidates.append(
             _build_candidate(
                 item=item,
@@ -248,4 +340,4 @@ def _point_near_line(px: float, py: float, raw_line: RawLine, tolerance: float) 
     return _point_line_distance(px, py, raw_line) <= tolerance
 
 
-__all__ = ["detect_dimension_candidates"]
+__all__ = ["detect_dimension_candidates", "looks_like_dimension_text"]

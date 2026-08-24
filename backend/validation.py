@@ -20,6 +20,7 @@ from backend.schemas.validation import ExtractionValidationReport, ValidationFie
 from backend.schemas.vision import VisionDocumentResult, VisionDimension, VisionArea
 from backend.schemas.units import LengthUnit, length_to_metres
 from backend.schemas.independent_measurements import IndependentMeasurement
+from backend.schemas.normalized_plan import NormalizedPlan
 from backend.vision_extraction import get_vision_extractor
 
 

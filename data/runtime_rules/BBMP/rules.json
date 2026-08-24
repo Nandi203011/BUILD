@@ -2,8 +2,8 @@
   {
     "rule_id": "bbmp-min-front-setback-residential",
     "municipality": "BBMP",
-    "citation": "4. Minimum setbacks",
-    "description": "Minimum front setback for residential buildings",
+    "citation": "UNVERIFIED placeholder, not traced to a gazette. Original stub citation: 4. Minimum setbacks",
+    "description": "[PLACEHOLDER - NOT A VERIFIED BBMP THRESHOLD] Minimum front setback for residential buildings",
     "applies_when": {},
     "threshold": {
       "field": "setbacks.front",
@@ -16,8 +16,8 @@
   {
     "rule_id": "bbmp-min-rear-setback-residential",
     "municipality": "BBMP",
-    "citation": "4. Minimum setbacks",
-    "description": "Minimum rear setback for residential buildings",
+    "citation": "UNVERIFIED placeholder, not traced to a gazette. Original stub citation: 4. Minimum setbacks",
+    "description": "[PLACEHOLDER - NOT A VERIFIED BBMP THRESHOLD] Minimum rear setback for residential buildings",
     "applies_when": {},
     "threshold": {
       "field": "setbacks.rear",
@@ -30,8 +30,8 @@
   {
     "rule_id": "bbmp-min-side-setback-residential",
     "municipality": "BBMP",
-    "citation": "4. Minimum setbacks",
-    "description": "Minimum side setback for residential buildings up to 9.5m height",
+    "citation": "UNVERIFIED placeholder, not traced to a gazette. Original stub citation: 4. Minimum setbacks",
+    "description": "[PLACEHOLDER - NOT A VERIFIED BBMP THRESHOLD] Minimum side setback for residential buildings up to 9.5m height",
     "applies_when": {},
     "threshold": {
       "field": "setbacks.right",
@@ -44,8 +44,8 @@
   {
     "rule_id": "bbmp-maximum-coverage-residential",
     "municipality": "BBMP",
-    "citation": "2. Maximum coverage",
-    "description": "Maximum permissible ground coverage for residential buildings",
+    "citation": "UNVERIFIED placeholder, not traced to a gazette. Original stub citation: 2. Maximum coverage",
+    "description": "[PLACEHOLDER - NOT A VERIFIED BBMP THRESHOLD] Maximum permissible ground coverage for residential buildings",
     "applies_when": {},
     "threshold": {
       "field": "coverage",
