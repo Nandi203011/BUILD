@@ -1,0 +1,405 @@
+{
+  "plan_id": "plan-PLAN6",
+  "source_document_id": "PLAN6",
+  "plot": {
+    "geometry": {
+      "coordinate_space": "METRIC_PLAN",
+      "polygon": {
+        "points": [
+          {
+            "x": 61.92304347687418,
+            "y": 2.0313043477805985
+          },
+          {
+            "x": 1.110869565192515,
+            "y": 2.0313043477805985
+          },
+          {
+            "x": 1.117217391279329,
+            "y": 42.82243478164974
+          },
+          {
+            "x": 61.92304347687418,
+            "y": 42.524086955569466
+          }
+        ]
+      },
+      "bounding_box": {
+        "min_x": 1.110869565192515,
+        "min_y": 2.0313043477805985,
+        "max_x": 61.92304347687418,
+        "max_y": 42.82243478164974
+      },
+      "points_per_metre": 37.80821917892886,
+      "rotation_degrees": 0.0,
+      "source_page": 0
+    },
+    "width": {
+      "value": 40.64195,
+      "raw_value": null,
+      "normalized_value": {
+        "magnitude": 40.642,
+        "unit": "m"
+      },
+      "confidence": {
+        "level": "MEDIUM",
+        "score": null,
+        "reason": "2/3 sources agree (['geometry (front edge)', 'geometry (rear edge)']); 1 rejected as outlier(s) ([\"dimension label ('AUTH1')\"])."
+      },
+      "source": "plot.width: outlier_detected across 3 source(s)",
+      "evidence": [
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "front plot boundary edge length, scaled to metres."
+        },
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "rear plot boundary edge length, scaled to metres."
+        }
+      ],
+      "conflict": null
+    },
+    "depth": {
+      "value": 13.739077272727274,
+      "raw_value": null,
+      "normalized_value": {
+        "magnitude": 13.7391,
+        "unit": "m"
+      },
+      "confidence": {
+        "level": "MEDIUM",
+        "score": null,
+        "reason": "44/64 sources agree ([\"dimension label ('355.59')\", \"dimension label ('50.97')\", \"dimension label ('5.76')\", \"dimension label ('2.03')\", \"dimension label ('30.75')\", \"dimension label ('79.03')\", \"dimension label ('187.05')\", \"dimension label ('187.05')\", \"dimension label ('03')\", \"dimension label ('FF-1')\", \"dimension label ('58.65')\", \"dimension label ('51.94')\", \"dimension label ('7')\", \"dimension label ('1')\", \"dimension label ('SF-1')\", \"dimension label ('58.65')\", \"dimension label ('51.94')\", \"dimension label ('7')\", \"dimension label ('1')\", \"dimension label ('175.95')\", \"dimension label ('155.82')\", \"dimension label ('21')\", \"dimension label ('3')\", \"dimension label ('A2 (RES )')\", \"dimension label ('1')\", \"dimension label ('355.59')\", \"dimension label ('50.97')\", \"dimension label ('5.76')\", \"dimension label ('2.03')\", \"dimension label ('30.75')\", \"dimension label ('79.03')\", \"dimension label ('187.05')\", \"dimension label ('187.05')\", \"dimension label ('03')\", \"dimension label ('1')\", \"dimension label ('355.59')\", \"dimension label ('50.97')\", \"dimension label ('5.76')\", \"dimension label ('2.03')\", \"dimension label ('30.75')\", \"dimension label ('79.03')\", \"dimension label ('187.05')\", \"dimension label ('187.05')\", \"dimension label ('3.00')\"]); 20 rejected as outlier(s) (['geometry (left edge)', 'geometry (right edge)', \"dimension label ('ISO_A1_(841.00_x_594.00_MM)')\", \"dimension label ('131.00')\", \"dimension label ('23.50')\", \"dimension label ('0.00')\", \"dimension label ('85.09')\", \"dimension label ('188.13')\", \"dimension label ('1.08')\", \"dimension label ('355.59')\", \"dimension label (' Accuracy of Scrutiny Report and Drawing is subject to accuracy of end-user provided data, 3rd party software/hardware/services, etc. We are not liable for any damages which may arise from use, or inability to use the Application.')\", \"dimension label ('W3')\", \"dimension label ('W2')\", \"dimension label ('W1')\", \"dimension label ('W3')\", \"dimension label ('W2')\", \"dimension label ('W1')\", \"dimension label ('W3')\", \"dimension label ('W2')\", \"dimension label ('W1')\"])."
+      },
+      "source": "plot.depth: outlier_detected across 64 source(s)",
+      "evidence": [
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "left plot boundary edge length, scaled to metres."
+        },
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "right plot boundary edge length, scaled to metres."
+        }
+      ],
+      "conflict": null
+    },
+    "area": {
+      "value": 131.0,
+      "raw_value": null,
+      "normalized_value": {
+        "magnitude": 131.0,
+        "unit": "m2"
+      },
+      "confidence": {
+        "level": "MEDIUM",
+        "score": null,
+        "reason": "CV-only; Vision did not emit this field."
+      },
+      "source": "FINAL:CV_ONLY",
+      "evidence": [],
+      "conflict": null
+    }
+  },
+  "building": {
+    "geometry": {
+      "coordinate_space": "METRIC_PLAN",
+      "polygon": {
+        "points": [
+          {
+            "x": 14.441304347502692,
+            "y": 35.43991304268462
+          },
+          {
+            "x": 14.447652173589507,
+            "y": 42.23843478166282
+          },
+          {
+            "x": 28.07643478197996,
+            "y": 42.23843478166282
+          },
+          {
+            "x": 28.07643478197996,
+            "y": 35.43991304268462
+          }
+        ]
+      },
+      "bounding_box": {
+        "min_x": 14.441304347502692,
+        "min_y": 35.43991304268462,
+        "max_x": 28.07643478197996,
+        "max_y": 42.23843478166282
+      },
+      "points_per_metre": 37.80821917892886,
+      "rotation_degrees": 0.0,
+      "source_page": 0
+    },
+    "width": {
+      "value": 6.843724999999999,
+      "raw_value": null,
+      "normalized_value": {
+        "magnitude": 6.8437,
+        "unit": "m"
+      },
+      "confidence": {
+        "level": "MEDIUM",
+        "score": null,
+        "reason": "4/7 sources agree (['geometry (building bounding box, frontage-aligned side)', \"dimension label ('1.30x2.75')\", \"dimension label ('1.20x1.20')\", \"dimension label ('1.20x1.20')\"]); 3 rejected as outlier(s) ([\"dimension label ('3')\", \"dimension label ('2')\", \"dimension label ('1.20X3.85')\"])."
+      },
+      "source": "building.width: outlier_detected across 7 source(s)",
+      "evidence": [
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "Building footprint extent aligned with the plot frontage axis."
+        }
+      ],
+      "conflict": null
+    },
+    "depth": {
+      "value": 12.479796,
+      "raw_value": null,
+      "normalized_value": {
+        "magnitude": 12.4798,
+        "unit": "m"
+      },
+      "confidence": {
+        "level": "MEDIUM",
+        "score": null,
+        "reason": "25 sources (['geometry (building bounding box, depth-aligned side)', \"dimension label ('1')\", \"dimension label ('2.40x4.60')\", \"dimension label ('10.00x2.35 =23.50 smt')\", \"dimension label ('Block :A2 (RES )')\", \"dimension label ('15.26')\", \"dimension label ('13.23')\", \"dimension label ('0.00')\", \"dimension label ('2.03')\", \"dimension label ('0.00')\", \"dimension label ('0.00')\", \"dimension label ('0.00')\", \"dimension label ('0.00')\", \"dimension label ('00')\", \"dimension label ('355.59')\", \"dimension label ('50.97')\", \"dimension label ('5.76')\", \"dimension label ('2.03')\", \"dimension label ('30.75')\", \"dimension label ('79.03')\", \"dimension label ('187.05')\", \"dimension label ('187.05')\", \"dimension label ('03')\", \"dimension label ('A2 (RES )')\", \"dimension label ('Building upto 12.0 Ht.')\"]) reconciled, spread=10.344."
+      },
+      "source": "building.depth: minor_variance across 25 source(s)",
+      "evidence": [
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "Building footprint extent aligned with the plot depth axis."
+        }
+      ],
+      "conflict": null
+    },
+    "footprint_area": {
+      "value": 85.09,
+      "raw_value": null,
+      "normalized_value": {
+        "magnitude": 85.09,
+        "unit": "m2"
+      },
+      "confidence": {
+        "level": "MEDIUM",
+        "score": null,
+        "reason": "CV-only; Vision did not emit this field."
+      },
+      "source": "FINAL:CV_ONLY",
+      "evidence": [],
+      "conflict": null
+    },
+    "floor_count": null
+  },
+  "road": {
+    "geometry": null,
+    "width": {
+      "value": 7.3,
+      "raw_value": null,
+      "normalized_value": {
+        "magnitude": 7.3,
+        "unit": "m"
+      },
+      "confidence": {
+        "level": "MEDIUM",
+        "score": null,
+        "reason": "CV-only; Vision did not emit this field."
+      },
+      "source": "FINAL:CV_ONLY",
+      "evidence": [],
+      "conflict": null
+    }
+  },
+  "setbacks": {
+    "front": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "confidence": {
+        "level": "MISSING",
+        "score": null,
+        "reason": "No geometry-derived distance or classified dimension found for the front setback. Rejected candidate(s): geometry distance 13.325 m exceeds the depth-axis budget (1.309 m) — discarded as implausible; dimension label ('1.20x1.20'=5.751 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('7.30m Wide Road'=7.300 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('UnitBUA Table for Block :A2 (RES )'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('GF-1'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('58.65'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('51.94'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('7'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('W3'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('12'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('W2'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.50'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('15'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('W1'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.80'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3.75'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('D2'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('0.75'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('09'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('D1'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('0.90'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('06'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.00'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.00'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('Required Parking(Table 7a)'=12.585 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('50 - 225'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded"
+      },
+      "source": null,
+      "evidence": [],
+      "conflict": null
+    },
+    "rear": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "confidence": {
+        "level": "MISSING",
+        "score": null,
+        "reason": "No geometry-derived distance or classified dimension found for the rear setback. Rejected candidate(s): geometry distance 33.847 m exceeds the depth-axis budget (1.309 m) — discarded as implausible; dimension label ('187.05'=11.194 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('Balance FAR Area ( 0.01 )'=7.911 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('355.59'=11.194 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('PLAN SHOWING PROPOSED RESIDENTIAL BUILDING ON SITE NO-08,'=7.403 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded"
+      },
+      "source": null,
+      "evidence": [],
+      "conflict": null
+    },
+    "left": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "confidence": {
+        "level": "CONFLICTING",
+        "score": null,
+        "reason": "geometry (building-to-left-boundary distance) reports 33.409 m but dimension label ('1') reports 3.892 m — a difference of 29.516 m, beyond tolerance (0.933 m). Not silently resolved."
+      },
+      "source": "setbacks.left: conflicting evidence",
+      "evidence": [
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "Metric-space distance from building footprint to the left plot edge."
+        }
+      ],
+      "conflict": {
+        "description": "geometry (building-to-left-boundary distance) reports 33.409 m but dimension label ('1') reports 3.892 m — a difference of 29.516 m, beyond tolerance (0.933 m). Not silently resolved.",
+        "conflicting_raw_values": [
+          {
+            "magnitude": 33.4086,
+            "unit": "m"
+          },
+          {
+            "magnitude": 3.8922,
+            "unit": "m"
+          }
+        ],
+        "conflicting_sources": [
+          "geometry (building-to-left-boundary distance)",
+          "dimension label ('1')"
+        ]
+      }
+    },
+    "right": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "confidence": {
+        "level": "CONFLICTING",
+        "score": null,
+        "reason": "geometry (building-to-right-boundary distance) reports 0.452 m but dimension label ('1') reports 6.789 m — a difference of 6.337 m, beyond tolerance (0.181 m). Not silently resolved."
+      },
+      "source": "setbacks.right: conflicting evidence",
+      "evidence": [
+        {
+          "source_type": "VECTOR_GEOMETRY",
+          "page": null,
+          "line": null,
+          "bounding_box": null,
+          "description": "Metric-space distance from building footprint to the right plot edge."
+        }
+      ],
+      "conflict": {
+        "description": "geometry (building-to-right-boundary distance) reports 0.452 m but dimension label ('1') reports 6.789 m — a difference of 6.337 m, beyond tolerance (0.181 m). Not silently resolved.",
+        "conflicting_raw_values": [
+          {
+            "magnitude": 0.4517,
+            "unit": "m"
+          },
+          {
+            "magnitude": 6.789,
+            "unit": "m"
+          }
+        ],
+        "conflicting_sources": [
+          "geometry (building-to-right-boundary distance)",
+          "dimension label ('1')"
+        ]
+      }
+    }
+  },
+  "coverage": {
+    "value": 79.15,
+    "raw_value": null,
+    "normalized_value": {
+      "magnitude": 79.15,
+      "unit": "%"
+    },
+    "confidence": {
+      "level": "MEDIUM",
+      "score": null,
+      "reason": "CV-only; Vision did not emit this field."
+    },
+    "source": "FINAL:CV_ONLY",
+    "evidence": [],
+    "conflict": null
+  },
+  "far": {
+    "value": 1.74,
+    "raw_value": null,
+    "normalized_value": {
+      "magnitude": 1.74,
+      "unit": "ratio"
+    },
+    "confidence": {
+      "level": "MEDIUM",
+      "score": null,
+      "reason": "CV-only; Vision did not emit this field."
+    },
+    "source": "FINAL:CV_ONLY",
+    "evidence": [],
+    "conflict": null
+  },
+  "conflicts": [
+    {
+      "description": "geometry (building-to-left-boundary distance) reports 33.409 m but dimension label ('1') reports 3.892 m — a difference of 29.516 m, beyond tolerance (0.933 m). Not silently resolved.",
+      "conflicting_raw_values": [
+        {
+          "magnitude": 33.4086,
+          "unit": "m"
+        },
+        {
+          "magnitude": 3.8922,
+          "unit": "m"
+        }
+      ],
+      "conflicting_sources": [
+        "geometry (building-to-left-boundary distance)",
+        "dimension label ('1')"
+      ]
+    },
+    {
+      "description": "geometry (building-to-right-boundary distance) reports 0.452 m but dimension label ('1') reports 6.789 m — a difference of 6.337 m, beyond tolerance (0.181 m). Not silently resolved.",
+      "conflicting_raw_values": [
+        {
+          "magnitude": 0.4517,
+          "unit": "m"
+        },
+        {
+          "magnitude": 6.789,
+          "unit": "m"
+        }
+      ],
+      "conflicting_sources": [
+        "geometry (building-to-right-boundary distance)",
+        "dimension label ('1')"
+      ]
+    }
+  ],
+  "overall_confidence_note": "Plot: Selected from 10 candidate(s) across 1 page(s). Winner only narrowly (0.05) beats the runner-up (0.85); ambiguous. | Scale: [local region-scoped] 2 scale samples but high spread (31.6%); treat with caution. | Front-side: Front edge resolved from FRONT label. Rear = farthest plot edge from the front edge. Left/right assigned as if standing at the front edge facing into the plot (arriving from the road). | Building blocks kept: 6, rejected: 4. | Distinct labeled areas in source text (kept separate from footprint_area): none found. | Resolved from page 0. | Final scalar values passed through independent CV + Vision agreement layer."
+}

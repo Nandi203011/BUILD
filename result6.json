@@ -1,0 +1,118 @@
+{
+  "plan_id": "plan-PLAN6",
+  "ruleset_id": "BBMP",
+  "ruleset_version": "1.0.0",
+  "rule_results": [
+    {
+      "rule_id": "bbmp-min-front-setback-residential",
+      "rule_description": "Minimum front setback for residential buildings",
+      "status": "INSUFFICIENT_DATA",
+      "observed_value": {
+        "value": null,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "MISSING",
+          "score": null,
+          "reason": "No geometry-derived distance or classified dimension found for the front setback. Rejected candidate(s): geometry distance 13.325 m exceeds the depth-axis budget (1.309 m) — discarded as implausible; dimension label ('1.20x1.20'=5.751 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('7.30m Wide Road'=7.300 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('UnitBUA Table for Block :A2 (RES )'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('GF-1'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('58.65'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('51.94'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('7'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1'=12.775 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('W3'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('12'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('W2'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.50'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('15'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('W1'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.80'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3.75'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.20'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('D2'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('0.75'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('09'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('D1'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('0.90'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('06'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.00'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.00'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('2.10'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('03'=11.696 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('Required Parking(Table 7a)'=12.585 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('A2 (RES )'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('50 - 225'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3'=12.575 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded"
+        },
+        "source": null,
+        "evidence": [],
+        "conflict": null
+      },
+      "required_value_description": "setbacks.front >= 8.0 m",
+      "explanation": "The measurement this rule checks was not found in the extracted plan.",
+      "citation": "4. Minimum setbacks"
+    },
+    {
+      "rule_id": "bbmp-min-rear-setback-residential",
+      "rule_description": "Minimum rear setback for residential buildings",
+      "status": "INSUFFICIENT_DATA",
+      "observed_value": {
+        "value": null,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "MISSING",
+          "score": null,
+          "reason": "No geometry-derived distance or classified dimension found for the rear setback. Rejected candidate(s): geometry distance 33.847 m exceeds the depth-axis budget (1.309 m) — discarded as implausible; dimension label ('187.05'=11.194 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('Balance FAR Area ( 0.01 )'=7.911 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('355.59'=11.194 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('PLAN SHOWING PROPOSED RESIDENTIAL BUILDING ON SITE NO-08,'=7.403 m) exceeds the depth-axis budget (1.309 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded"
+        },
+        "source": null,
+        "evidence": [],
+        "conflict": null
+      },
+      "required_value_description": "setbacks.rear >= 4.5 m",
+      "explanation": "The measurement this rule checks was not found in the extracted plan.",
+      "citation": "4. Minimum setbacks"
+    },
+    {
+      "rule_id": "bbmp-min-side-setback-residential",
+      "rule_description": "Minimum side setback for residential buildings up to 9.5m height",
+      "status": "CONFLICTING_EVIDENCE",
+      "observed_value": {
+        "value": null,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "CONFLICTING",
+          "score": null,
+          "reason": "geometry (building-to-right-boundary distance) reports 0.452 m but dimension label ('1') reports 6.789 m — a difference of 6.337 m, beyond tolerance (0.181 m). Not silently resolved."
+        },
+        "source": "setbacks.right: conflicting evidence",
+        "evidence": [
+          {
+            "source_type": "VECTOR_GEOMETRY",
+            "page": null,
+            "line": null,
+            "bounding_box": null,
+            "description": "Metric-space distance from building footprint to the right plot edge."
+          }
+        ],
+        "conflict": {
+          "description": "geometry (building-to-right-boundary distance) reports 0.452 m but dimension label ('1') reports 6.789 m — a difference of 6.337 m, beyond tolerance (0.181 m). Not silently resolved.",
+          "conflicting_raw_values": [
+            {
+              "magnitude": 0.4517,
+              "unit": "m"
+            },
+            {
+              "magnitude": 6.789,
+              "unit": "m"
+            }
+          ],
+          "conflicting_sources": [
+            "geometry (building-to-right-boundary distance)",
+            "dimension label ('1')"
+          ]
+        }
+      },
+      "required_value_description": "setbacks.right >= 4.5 m",
+      "explanation": "geometry (building-to-right-boundary distance) reports 0.452 m but dimension label ('1') reports 6.789 m — a difference of 6.337 m, beyond tolerance (0.181 m). Not silently resolved.",
+      "citation": "4. Minimum setbacks"
+    },
+    {
+      "rule_id": "bbmp-maximum-coverage-residential",
+      "rule_description": "Maximum permissible ground coverage for residential buildings",
+      "status": "FAIL",
+      "observed_value": {
+        "value": 79.15,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 79.15,
+          "unit": "%"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "CV-only; Vision did not emit this field."
+        },
+        "source": "FINAL:CV_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "required_value_description": "coverage <= 40 %",
+      "explanation": "Observed 79.15 does not satisfy requirement 'coverage <= 40 %'.",
+      "citation": "2. Maximum coverage"
+    }
+  ]
+}

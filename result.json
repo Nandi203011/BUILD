@@ -1,0 +1,102 @@
+{
+  "plan_id": "plan-PLAN5",
+  "ruleset_id": "BBMP",
+  "ruleset_version": "1.0.0",
+  "rule_results": [
+    {
+      "rule_id": "bbmp-min-front-setback-residential",
+      "rule_description": "Minimum front setback for residential buildings",
+      "status": "INSUFFICIENT_DATA",
+      "observed_value": {
+        "value": null,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "MISSING",
+          "score": null,
+          "reason": "No geometry-derived distance or classified dimension found for the front setback. Rejected candidate(s): geometry distance 4.733 m exceeds the depth-axis budget (-3.308 m) — discarded as implausible; dimension label ('1:100'=4.598 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('160.77'=1.542 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3.00'=3.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('3.00'=3.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('150m'=150.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('150m'=150.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('00m'=2.171 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.0m'=1.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('.00m'=2.171 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('1.0m'=1.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('65'=2.171 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('58.13'=58.130 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('SCALE : 1:100'=4.598 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('SITE AREA : 160.77 Sq.m'=1.542 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('4 |Terrace'=3.952 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('FRONT 3.00 m 3.00 m'=3.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('REAR | 150m | 150m'=150.000 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('LeFT | 00m | 1.0m _|'=2.171 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded; dimension label ('Richt | .00m | 1.0m'=2.171 m) exceeds the depth-axis budget (-3.308 m) — almost certainly a misclassified plot/building dimension rather than a real setback — discarded"
+        },
+        "source": null,
+        "evidence": [],
+        "conflict": null
+      },
+      "required_value_description": "setbacks.front >= 8.0 m",
+      "explanation": "The measurement this rule checks was not found in the extracted plan.",
+      "citation": "4. Minimum setbacks"
+    },
+    {
+      "rule_id": "bbmp-min-rear-setback-residential",
+      "rule_description": "Minimum rear setback for residential buildings",
+      "status": "INSUFFICIENT_DATA",
+      "observed_value": {
+        "value": null,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "MISSING",
+          "score": null,
+          "reason": "No geometry-derived distance or classified dimension found for the rear setback. Rejected candidate(s): geometry distance 17.807 m exceeds the depth-axis budget (-3.308 m) — discarded as implausible"
+        },
+        "source": null,
+        "evidence": [],
+        "conflict": null
+      },
+      "required_value_description": "setbacks.rear >= 4.5 m",
+      "explanation": "The measurement this rule checks was not found in the extracted plan.",
+      "citation": "4. Minimum setbacks"
+    },
+    {
+      "rule_id": "bbmp-min-side-setback-residential",
+      "rule_description": "Minimum side setback for residential buildings up to 9.5m height",
+      "status": "FAIL",
+      "observed_value": {
+        "value": 1.2178,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 1.2178,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "3/4 sources agree ([\"dimension label ('7')\", \"dimension label ('No.104')\", \"dimension label ('SITE No.104')\"]); 1 rejected as outlier(s) (['geometry (building-to-right-boundary distance)'])."
+        },
+        "source": "setbacks.right: outlier_detected across 4 source(s)",
+        "evidence": [
+          {
+            "source_type": "VECTOR_GEOMETRY",
+            "page": null,
+            "line": null,
+            "bounding_box": null,
+            "description": "Metric-space distance from building footprint to the right plot edge."
+          }
+        ],
+        "conflict": null
+      },
+      "required_value_description": "setbacks.right >= 4.5 m",
+      "explanation": "Observed 1.2178 does not satisfy requirement 'setbacks.right >= 4.5 m'.",
+      "citation": "4. Minimum setbacks"
+    },
+    {
+      "rule_id": "bbmp-maximum-coverage-residential",
+      "rule_description": "Maximum permissible ground coverage for residential buildings",
+      "status": "INSUFFICIENT_DATA",
+      "observed_value": {
+        "value": null,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "MISSING",
+          "score": null,
+          "reason": "Coverage requires both building.footprint_area and plot.area to be resolved."
+        },
+        "source": null,
+        "evidence": [],
+        "conflict": null
+      },
+      "required_value_description": "coverage <= 40 %",
+      "explanation": "The measurement this rule checks was not found in the extracted plan.",
+      "citation": "2. Maximum coverage"
+    }
+  ]
+}

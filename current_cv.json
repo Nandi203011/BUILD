@@ -1,0 +1,305 @@
+{
+  "document_id": "PLAN2",
+  "pages_analyzed": [
+    1
+  ],
+  "measurements": [
+    {
+      "field": "plot.width",
+      "value_m": 12.192,
+      "value": null,
+      "unit": null,
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "12.19(40'0\")"
+      ],
+      "note": "Explicit site-plan width label anchored to outer plot rectangle.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2081.6,
+        680.6,
+        2254.3,
+        939.6
+      ]
+    },
+    {
+      "field": "plot.depth",
+      "value_m": 18.28,
+      "value": null,
+      "unit": null,
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "18.28"
+      ],
+      "note": "Explicit site-plan depth label anchored to outer plot rectangle.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2081.6,
+        680.6,
+        2254.3,
+        939.6
+      ]
+    },
+    {
+      "field": "building.width",
+      "value_m": 10.5952,
+      "value": null,
+      "unit": null,
+      "source": "VECTOR_GEOMETRY",
+      "confidence": 0.97,
+      "evidence": [
+        "inner rectangle width 150.10 pt",
+        "outer scale 14.167 pt/m"
+      ],
+      "note": "Building width derived from the nested building footprint geometry and site-plan scale; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2092.9,
+        692.0,
+        2243.0,
+        925.5
+      ]
+    },
+    {
+      "field": "building.depth",
+      "value_m": 16.4822,
+      "value": null,
+      "unit": null,
+      "source": "VECTOR_GEOMETRY",
+      "confidence": 0.97,
+      "evidence": [
+        "inner rectangle height 233.50 pt",
+        "outer scale 14.167 pt/m"
+      ],
+      "note": "Building depth derived from the nested building footprint geometry and site-plan scale; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2092.9,
+        692.0,
+        2243.0,
+        925.5
+      ]
+    },
+    {
+      "field": "setbacks.rear",
+      "value_m": 0.8,
+      "value": null,
+      "unit": null,
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "0.80"
+      ],
+      "note": "Explicit setback label spatially located in the top plot/building gap.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2081.6,
+        680.6,
+        2254.3,
+        939.6
+      ]
+    },
+    {
+      "field": "setbacks.front",
+      "value_m": 1.0,
+      "value": null,
+      "unit": null,
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "1.00"
+      ],
+      "note": "Explicit setback label spatially located in the bottom plot/building gap.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2081.6,
+        680.6,
+        2254.3,
+        939.6
+      ]
+    },
+    {
+      "field": "setbacks.left",
+      "value_m": 0.8,
+      "value": null,
+      "unit": null,
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "0.80"
+      ],
+      "note": "Explicit setback label spatially located in the left plot/building gap.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2081.6,
+        680.6,
+        2254.3,
+        939.6
+      ]
+    },
+    {
+      "field": "setbacks.right",
+      "value_m": 0.8,
+      "value": null,
+      "unit": null,
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "0.80"
+      ],
+      "note": "Explicit setback label spatially located in the right plot/building gap.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2081.6,
+        680.6,
+        2254.3,
+        939.6
+      ]
+    },
+    {
+      "field": "road.width",
+      "value_m": 9.2,
+      "value": null,
+      "unit": null,
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "9.20m WIDE R O A D"
+      ],
+      "note": "Explicit road-width label; not inferred from the road rectangle.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2081.6,
+        680.6,
+        2254.3,
+        939.6
+      ]
+    },
+    {
+      "field": "plot.area",
+      "value_m": null,
+      "value": 222.83,
+      "unit": "m2",
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "AREA OF PLOT (Minimum) -> 222.83"
+      ],
+      "note": "Explicit labelled area/coverage/FAR value from the PDF native text layer; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2317.16,
+        435.39,
+        2336.58,
+        443.13
+      ]
+    },
+    {
+      "field": "building.footprint_area",
+      "value_m": null,
+      "value": 174.52,
+      "unit": "m2",
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "Proposed Coverage Area (78.32 %) -> 174.52"
+      ],
+      "note": "Explicit labelled area/coverage/FAR value from the PDF native text layer; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2317.16,
+        478.83,
+        2336.58,
+        486.57
+      ]
+    },
+    {
+      "field": "coverage",
+      "value_m": null,
+      "value": 78.32,
+      "unit": "%",
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "Proposed Coverage Area (78.32 %) -> 174.52"
+      ],
+      "note": "Explicit labelled area/coverage/FAR value from the PDF native text layer; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2317.16,
+        478.83,
+        2336.58,
+        486.57
+      ]
+    },
+    {
+      "field": "far.area",
+      "value_m": null,
+      "value": 386.55,
+      "unit": "m2",
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "Proposed FAR Area -> 386.55"
+      ],
+      "note": "Explicit labelled area/coverage/FAR value from the PDF native text layer; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2317.16,
+        554.67,
+        2336.58,
+        562.41
+      ]
+    },
+    {
+      "field": "far",
+      "value_m": null,
+      "value": 1.73,
+      "unit": "ratio",
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "Achieved Net FAR Area ( 1.73 )"
+      ],
+      "note": "Explicit labelled area/coverage/FAR value from the PDF native text layer; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2317.16,
+        565.59,
+        2336.58,
+        573.33
+      ]
+    },
+    {
+      "field": "building.gross_built_up_area",
+      "value_m": null,
+      "value": 579.9,
+      "unit": "m2",
+      "source": "NATIVE_TEXT",
+      "confidence": 0.99,
+      "evidence": [
+        "Proposed BuiltUp Area -> 579.90"
+      ],
+      "note": "Explicit labelled area/coverage/FAR value from the PDF native text layer; no Vision input.",
+      "page": 0,
+      "geometry_bbox_pts": [
+        2317.16,
+        598.11,
+        2336.58,
+        605.85
+      ]
+    }
+  ],
+  "warnings": [],
+  "site_plan_page": 1,
+  "site_plan_bbox_pts": [
+    2081.6,
+    680.6,
+    2254.3,
+    939.6
+  ],
+  "scale_points_per_metre": 14.166758199946024,
+  "scale_confidence": 0.99
+}

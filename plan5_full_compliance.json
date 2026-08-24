@@ -1,0 +1,1668 @@
+{
+  "pipeline": {
+    "name": "architectural_pdf_to_rag_compliance",
+    "municipality": "BBMP",
+    "source_pdf": "data\\test_plans\\PLAN5.pdf",
+    "rag": "FAISS + BM25 + Reciprocal Rank Fusion",
+    "rule_generation": "RASE ephemeral draft from retrieved regulation text",
+    "final_decision": "deterministic RuleEvaluator",
+    "live_ruleset_modified": false
+  },
+  "plan": {
+    "plan_id": "plan-PLAN5",
+    "source_document_id": "PLAN5",
+    "plot": {
+      "geometry": {
+        "coordinate_space": "METRIC_PLAN",
+        "polygon": {
+          "points": [
+            {
+              "x": 0.7347169788793085,
+              "y": 0.5521509417032379
+            },
+            {
+              "x": 0.7347169788793085,
+              "y": 30.675547075754885
+            },
+            {
+              "x": 21.346867859075182,
+              "y": 30.675547075754885
+            },
+            {
+              "x": 21.346867859075182,
+              "y": 0.5521509417032379
+            }
+          ]
+        },
+        "bounding_box": {
+          "min_x": 0.7347169788793085,
+          "min_y": 0.5521509417032379,
+          "max_x": 21.346867859075182,
+          "max_y": 30.675547075754885
+        },
+        "points_per_metre": 53.89830525000711,
+        "rotation_degrees": 0.0,
+        "source_page": 0
+      },
+      "width": {
+        "value": 17.59,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 17.59,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "depth": {
+        "value": 9.14,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 9.14,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "area": {
+        "value": 23.6582,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 23.6582,
+          "unit": "sq_m"
+        },
+        "confidence": {
+          "level": "HIGH",
+          "score": null,
+          "reason": "Plot area computed from semantically resolved plot width x depth."
+        },
+        "source": "plot.area = plot.width x plot.depth",
+        "evidence": [],
+        "conflict": null
+      }
+    },
+    "building": {
+      "geometry": {
+        "coordinate_space": "METRIC_PLAN",
+        "polygon": {
+          "points": [
+            {
+              "x": 0.8460377332549613,
+              "y": 18.359018811632662
+            },
+            {
+              "x": 7.86815091927114,
+              "y": 18.367924471982715
+            },
+            {
+              "x": 7.863698089096114,
+              "y": 25.94218859970213
+            },
+            {
+              "x": 0.8415849030799353,
+              "y": 25.937735769527105
+            }
+          ]
+        },
+        "bounding_box": {
+          "min_x": 0.8415849030799353,
+          "min_y": 18.359018811632662,
+          "max_x": 7.86815091927114,
+          "max_y": 25.94218859970213
+        },
+        "points_per_metre": 53.89830525000711,
+        "rotation_degrees": 0.0,
+        "source_page": 0
+      },
+      "width": {
+        "value": 13.09,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 13.09,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "depth": {
+        "value": 7.14,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 7.14,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "footprint_area": {
+        "value": null,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "CONFLICTING",
+          "score": null,
+          "reason": "Computed building.footprint_area (79.069 m²) exceeds the resolved plot.area (23.658 m²), which is physically impossible. This most likely means the selected building candidate does not actually belong to the same drawing region as the selected plot candidate."
+        },
+        "source": null,
+        "evidence": [],
+        "conflict": {
+          "description": "Computed building.footprint_area (79.069 m²) exceeds the resolved plot.area (23.658 m²), which is physically impossible. This most likely means the selected building candidate does not actually belong to the same drawing region as the selected plot candidate.",
+          "conflicting_raw_values": [
+            {
+              "magnitude": 79.0694,
+              "unit": "sq_m"
+            },
+            {
+              "magnitude": 23.6582,
+              "unit": "sq_m"
+            }
+          ],
+          "conflicting_sources": [
+            "building.footprint_area (computed)",
+            "plot.area"
+          ]
+        }
+      },
+      "floor_count": {
+        "value": 4,
+        "raw_value": null,
+        "normalized_value": null,
+        "confidence": {
+          "level": "HIGH",
+          "score": null,
+          "reason": "Distinct floor-plan regions identified by the vision semantic layer."
+        },
+        "source": "vision floor-plan region count",
+        "evidence": [],
+        "conflict": null
+      }
+    },
+    "road": {
+      "geometry": null,
+      "width": {
+        "value": 10.0,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 10.0,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "HIGH",
+          "score": null,
+          "reason": "Independent CV and Vision agree within 0.100 m."
+        },
+        "source": "FINAL:CV+VISION_AGREED",
+        "evidence": [],
+        "conflict": null
+      }
+    },
+    "setbacks": {
+      "front": {
+        "value": 3.0,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 3.0,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "rear": {
+        "value": 1.5,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 1.5,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "left": {
+        "value": 1.0,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 1.0,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      },
+      "right": {
+        "value": 1.0,
+        "raw_value": null,
+        "normalized_value": {
+          "magnitude": 1.0,
+          "unit": "m"
+        },
+        "confidence": {
+          "level": "MEDIUM",
+          "score": null,
+          "reason": "Vision-only; CV did not resolve this field."
+        },
+        "source": "FINAL:VISION_ONLY",
+        "evidence": [],
+        "conflict": null
+      }
+    },
+    "coverage": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "confidence": {
+        "level": "MISSING",
+        "score": null,
+        "reason": "Coverage requires both building.footprint_area and plot.area to be resolved."
+      },
+      "source": null,
+      "evidence": [],
+      "conflict": null
+    },
+    "far": {
+      "value": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "confidence": {
+        "level": "MISSING",
+        "score": null,
+        "reason": "FAR requires both building.footprint_area and plot.area to be resolved."
+      },
+      "source": null,
+      "evidence": [],
+      "conflict": null
+    },
+    "conflicts": [
+      {
+        "description": "Computed building.footprint_area (79.069 m²) exceeds the resolved plot.area (23.658 m²), which is physically impossible. This most likely means the selected building candidate does not actually belong to the same drawing region as the selected plot candidate.",
+        "conflicting_raw_values": [
+          {
+            "magnitude": 79.0694,
+            "unit": "sq_m"
+          },
+          {
+            "magnitude": 23.6582,
+            "unit": "sq_m"
+          }
+        ],
+        "conflicting_sources": [
+          "building.footprint_area (computed)",
+          "plot.area"
+        ]
+      },
+      {
+        "description": "Impossible geometry: building.depth (7.140 m) >= plot.depth (1.152 m).",
+        "conflicting_raw_values": [
+          {
+            "magnitude": 1.1523809523809523,
+            "unit": "m"
+          },
+          {
+            "magnitude": 7.14,
+            "unit": "m"
+          }
+        ],
+        "conflicting_sources": [
+          "plot.depth",
+          "building.depth"
+        ]
+      },
+      {
+        "description": "Rectangular cross-check failed: building.width + left + right setback (13.074 m) does not match plot.width (20.530 m); difference 7.456 m exceeds tolerance 1.026 m.",
+        "conflicting_raw_values": [
+          {
+            "magnitude": 13.07415,
+            "unit": "m"
+          },
+          {
+            "magnitude": 20.529850000000003,
+            "unit": "m"
+          }
+        ],
+        "conflicting_sources": [
+          "building.width+setbacks.left+setbacks.right",
+          "plot.width"
+        ]
+      },
+      {
+        "description": "Rectangular cross-check failed: building.depth + front + rear setback (11.640 m) does not match plot.depth (1.152 m); difference 10.488 m exceeds tolerance 0.058 m.",
+        "conflicting_raw_values": [
+          {
+            "magnitude": 11.64,
+            "unit": "m"
+          },
+          {
+            "magnitude": 1.1523809523809523,
+            "unit": "m"
+          }
+        ],
+        "conflicting_sources": [
+          "building.depth+setbacks.front+setbacks.rear",
+          "plot.depth"
+        ]
+      }
+    ],
+    "overall_confidence_note": "Plot: Selected from 14 candidate(s) across 1 page(s). Winner only narrowly (0.00) beats the runner-up (1.04); ambiguous. | Scale: [local region-scoped] 58 scale samples but high spread (121.1%); treat with caution. 6 sample(s) rejected as outliers (robust MAD filter). | Front-side: Front edge resolved from FRONT label. Rear = farthest plot edge from the front edge. Left/right assigned as if standing at the front edge facing into the plot (arriving from the road). | Building blocks kept: 6, rejected: 8. | Distinct labeled areas in source text (kept separate from footprint_area): none found. | Resolved from page 0. | Final scalar values passed through independent CV + Vision agreement layer."
+  },
+  "retrieval": {
+    "plot.width": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less::0",
+        "text": "7.2 \nNo Plan shall be sanctioned for a residential detached building on a plot measuring less \nthan 50 sqm. or having width less than 6 metres.  In specific cases of sites for housing \nschemes for EWS, LIG, Slum Clearance and Improvement Schemes as well as \nreconstruction in case of densely populated areas, and plot sub-divided due to family \npartitions,  the Authority may relax the above conditions.",
+        "clause_ref": "7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 19,
+        "score": 0.7373450398445129,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032018
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.2 Stipulations for group housing - Stipulations for group housing are indicated in the::0",
+        "text": "12.2 \nStipulations for group housing - Stipulations for group housing are indicated in the \nTable 9. \nTABLE 9 \n(Bye-law 12.0) \nGROUP HOUSING \n \nThe Table showing the maximum plot coverage FAR, minimum setbacks and minimum \nroad width for Group Housing is given below. \n \nPlot Area \nMinimum \nRoad \nwidth in \nMtrs. \nMaximum \nplot \ncoverage \nMaximum \nFAR \nMinimum Set-backs in Meters \n \n \n \n \nFront \nRear \nLeft \nRight \nUpto 0.40 Hectares \n12 \n60% \n2.00 \n5.0 \n4.5 \n4.5",
+        "clause_ref": "12.2 Stipulations for group housing - Stipulations for group housing are indicated in the",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.5859674215316772,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.031281
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.5680923461914062,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.031099
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "text": "0.50 \nOver 12.0 \nNote:  After leaving minimum set-backs as per the above table, if the remaining portion of the plot \ncannot be used for erecting the building, the Authority may insist the set backs applicable for \nresidential buildings.   \n \nTABLE 11 \n(Bye-law 13.2) \nREGULATIONS FOR FLATTED FACTORIES",
+        "clause_ref": "0.50 Over 12.0",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.5699865221977234,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030798
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.1 Norms for Approval of Group Housing Plan::0",
+        "text": "12.1 \nNorms for Approval of Group Housing Plan  \n \nThe following norms shall be adopted while approving the layout plan for group housing:- \ni) \nThe boundary roads if any must have a minimum width of 12 mtr. \nii) \nThe FAR should be considered with reference to the width of the public road abutting the \nproperty and the FAR should be calculated after deducting the area reserved for parks, \nopen spaces and civic amenities. \niii) \nThe set-backs should be provided with reference to depth and width of total plot area. \niv) \nThe coverage shall be with reference to total area of the layout. \nv) \nThe distance between the buildings should be a minimum of half of the hieght of the \ntallest building. \nvi) \n25% of the total area be reserved for CA, parks and open spaces, subject to a minimum \nof 15% for parks and open space. \nvii) \nThe means of access to the building blocks in the area of group housing shall be as \nfollows: \n \n \n \nAccess length in mtrs.                   \nMin. width \n \na) \nLess than 100 mtrs. \n6 mtrs. \n \nb) \n100 to 200 mtrs. \n9 mtrs. \n \nc) \nMore than 200 mtrs. \n12 mtrs. \n \nvii) \nThe area reserved for Parks and Open spaces, CA and roads (other than internal access \nin each sub-divided plot) shall be handed over free of cost to the B.D.A through registered \nrelinquishment deed before issue of work order.",
+        "clause_ref": "12.1 Norms for Approval of Group Housing Plan",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.632418692111969,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030118
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::8.0 NOTE:    1)   Group housing means more than two buildings on a plot with one or more floors and::0",
+        "text": "8.0 \nNOTE:    1)   Group housing means more than two buildings on a plot with one or more floors and \nwith one or more dwelling units in each floor.  They are connected by an access of \nnot less than 3.5 mtrs. in width, if they are not approachable directly from the \nexisting roads. \n2) Where the sital area o group housing exceeds 4000 sq.mtrs. approval of layout \nshowing the general arrangement of residential building blocks, and dimesnsions of \nplot earmarked for each building blocks, means of access roads and civic amenity \nareas, should preceed the approval to building plan. \n3) In case, the height of group housing building exeed 9.5m, then set back to be left \nalround the premises shall be as er Table 23 or Table 25 whichever is higher.",
+        "clause_ref": "8.0 NOTE:    1)   Group housing means more than two buildings on a plot with one or more floors and",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.6199383735656738,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.02967
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.::0",
+        "text": "9.3.2 \nMinimum depth or width of a site for high rise buildings shall be 21 mtrs.  \n9.3.3.  Minimum road width facing a high rise building shall be 12mts.",
+        "clause_ref": "9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.5530657172203064,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029469
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::15.1 The height of the building shall be governed by the limitation of the FAR, coverage,::0",
+        "text": "15.1 \nThe height of the building shall be governed by the limitation of the FAR, coverage, \nsetbacks and  the width of the street facing the plot as stipulated in the respective tables.",
+        "clause_ref": "15.1 The height of the building shall be governed by the limitation of the FAR, coverage,",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 33,
+        "score": 0.6632771492004395,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029462
+      }
+    ],
+    "plot.depth": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "text": "Building Bye-Laws – 2003 \n \n \n \n \n10\n \ne) the position of the adjacent plots whether vacant or built up; \n \nf) \nthe area to be occupied by the proposed building and the set backs proposed for \nproper air and ventilation; \n \ng) the nature of the ground on which the proposed building is to be erected, whether \nnatural like, rocky, gravelly, clayey, sandy etc., or made up ground. In the case of \nmade up ground, the time when it was so made up and the materials used in \nmaking it up shall be indicated.  In case of sloping ground where the gradient \nexceeds 5% (1:20) block levels have to be furnished in the site plan; \n \nh) any physical features such as wells, drains, transmission lines, etc.; \n \ni) \nnatural features like existing trees, ridges, valleys etc., \n \nj) \nblock levels in cases where basement/cellar floors are proposed below ground \nlevel; \n \nk) such other particulars, as may be specified by the Authority. \n3.2.(5.3) Building plan – Building plan drawn to a scale of not more than 1:100 showing the \nfollowing particulars, namely \n \na)  floor plans of all floors indicating north line and the various parts of the building, \nsizes of rooms, position of stair-cases and lifts, machine rooms, ramps etc., in \ndetail along with street elevation;. \nb) use or occupancy of all parts of the building; \nc) exact location of essential services viz., water closets, baths, sinks, etc; \nd) sectional drawing showing sizes of footing, thickness of walls, spacing of columns, \nthickness of roof slab, height of  rooms, height of parapet, drainage and slope of \nthe terrace roof details of staircase showing tread, rise and landing width, railing, \netc; \ne) details of ventilation of all rooms; \nf) \nopen spaces or yards inside or surrounding the buildings; \ng) sewerage arrangements; \nh) the schedule of all doors, windows, and ventilators showing sizes and numbers; \ni) \ndimensions of projected portions beyond the walls like chajja, balcony, canopy, etc; \nj) \nin case of basement floor, position of the ramp with respect to the entrance, ground \nlevel and building, with a slope not exceeding 1 to 10, the drainage arrangements \nin the basement floor, etc; \nk) arrangements for vehicular parking as per standards laid down in bye-law 16.0 \nindicating the entry, exit of vehicles, drive way, etc; \nl) \nsuch other particulars like, site area, plinth area of all buildings, areas of each floor \nand total floor area, building coverage, total height of building, etc shall be \nindicated;",
+        "clause_ref": "UNCATEGORISED",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 10,
+        "score": 0.5446643233299255,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.039085
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.::0",
+        "text": "9.3.2 \nMinimum depth or width of a site for high rise buildings shall be 21 mtrs.  \n9.3.3.  Minimum road width facing a high rise building shall be 12mts.",
+        "clause_ref": "9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.5896328091621399,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032002
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "text": "0.50 \nOver 12.0 \nNote:  After leaving minimum set-backs as per the above table, if the remaining portion of the plot \ncannot be used for erecting the building, the Authority may insist the set backs applicable for \nresidential buildings.   \n \nTABLE 11 \n(Bye-law 13.2) \nREGULATIONS FOR FLATTED FACTORIES",
+        "clause_ref": "0.50 Over 12.0",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.5646644234657288,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030798
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less::0",
+        "text": "7.2 \nNo Plan shall be sanctioned for a residential detached building on a plot measuring less \nthan 50 sqm. or having width less than 6 metres.  In specific cases of sites for housing \nschemes for EWS, LIG, Slum Clearance and Improvement Schemes as well as \nreconstruction in case of densely populated areas, and plot sub-divided due to family \npartitions,  the Authority may relax the above conditions.",
+        "clause_ref": "7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 19,
+        "score": 0.7004789113998413,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030679
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.1 Norms for Approval of Group Housing Plan::0",
+        "text": "12.1 \nNorms for Approval of Group Housing Plan  \n \nThe following norms shall be adopted while approving the layout plan for group housing:- \ni) \nThe boundary roads if any must have a minimum width of 12 mtr. \nii) \nThe FAR should be considered with reference to the width of the public road abutting the \nproperty and the FAR should be calculated after deducting the area reserved for parks, \nopen spaces and civic amenities. \niii) \nThe set-backs should be provided with reference to depth and width of total plot area. \niv) \nThe coverage shall be with reference to total area of the layout. \nv) \nThe distance between the buildings should be a minimum of half of the hieght of the \ntallest building. \nvi) \n25% of the total area be reserved for CA, parks and open spaces, subject to a minimum \nof 15% for parks and open space. \nvii) \nThe means of access to the building blocks in the area of group housing shall be as \nfollows: \n \n \n \nAccess length in mtrs.                   \nMin. width \n \na) \nLess than 100 mtrs. \n6 mtrs. \n \nb) \n100 to 200 mtrs. \n9 mtrs. \n \nc) \nMore than 200 mtrs. \n12 mtrs. \n \nvii) \nThe area reserved for Parks and Open spaces, CA and roads (other than internal access \nin each sub-divided plot) shall be handed over free of cost to the B.D.A through registered \nrelinquishment deed before issue of work order.",
+        "clause_ref": "12.1 Norms for Approval of Group Housing Plan",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.5739067196846008,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.02971
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::13.2 The minimum plot area, maximum plot coverage, maximum FAR and minimum set backs::0",
+        "text": "13.2 \nThe minimum plot area, maximum plot coverage, maximum FAR and minimum set backs \nfor flatted factories shall be as specified in Table 11.",
+        "clause_ref": "13.2 The minimum plot area, maximum plot coverage, maximum FAR and minimum set backs",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.5520586967468262,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029631
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::25.0 TELECOM SERVICES.::0",
+        "text": "25.0 \nTELECOM SERVICES. \na) \nEvery Residential / Commercial premises should provide an access path for leading \ncopper / optical fibre cable to the building from outside the compound to the building: \nb) \nA single 32mm GI pipe buried at a minimum depth of 60 cms from the compound wall \nto the access point inside the building. A hand hole of 0.60 x 0.60 x 0.60m at the \noutside of the compound wall where the pipe has been terminated should be provided. \nc) \nIn case of multistoreyed residential / business premises, minimum 2 pipes, one of \n32mm and 2nd one of 60mm dia should be laid at a minimum depth of 60 cms with \nhand hole at the boundary of the compound towards the street / road. \nd) \nThe buildings should be completely pre wired within using concealed conduits for their \ncommunication requirements. \ne) \nIn case of the Multi-storeyed building a separate room preferably 4.50 x 3.65m may be \nprovided  in the basement for installation of telecom equipment. The room should have",
+        "clause_ref": "25.0 TELECOM SERVICES.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 47,
+        "score": 0.511474609375,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029551
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.2 Stipulations for group housing - Stipulations for group housing are indicated in the::0",
+        "text": "12.2 \nStipulations for group housing - Stipulations for group housing are indicated in the \nTable 9. \nTABLE 9 \n(Bye-law 12.0) \nGROUP HOUSING \n \nThe Table showing the maximum plot coverage FAR, minimum setbacks and minimum \nroad width for Group Housing is given below. \n \nPlot Area \nMinimum \nRoad \nwidth in \nMtrs. \nMaximum \nplot \ncoverage \nMaximum \nFAR \nMinimum Set-backs in Meters \n \n \n \n \nFront \nRear \nLeft \nRight \nUpto 0.40 Hectares \n12 \n60% \n2.00 \n5.0 \n4.5 \n4.5",
+        "clause_ref": "12.2 Stipulations for group housing - Stipulations for group housing are indicated in the",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.5282834768295288,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028219
+      }
+    ],
+    "plot.area": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::1. Minimum plot area::0",
+        "text": "1. Minimum plot area \n: \n1000 sq. mtrs.",
+        "clause_ref": "1. Minimum plot area",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.6068825721740723,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.031754
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::13.2 The minimum plot area, maximum plot coverage, maximum FAR and minimum set backs::0",
+        "text": "13.2 \nThe minimum plot area, maximum plot coverage, maximum FAR and minimum set backs \nfor flatted factories shall be as specified in Table 11.",
+        "clause_ref": "13.2 The minimum plot area, maximum plot coverage, maximum FAR and minimum set backs",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.5715979933738708,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030886
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less::0",
+        "text": "7.2 \nNo Plan shall be sanctioned for a residential detached building on a plot measuring less \nthan 50 sqm. or having width less than 6 metres.  In specific cases of sites for housing \nschemes for EWS, LIG, Slum Clearance and Improvement Schemes as well as \nreconstruction in case of densely populated areas, and plot sub-divided due to family \npartitions,  the Authority may relax the above conditions.",
+        "clause_ref": "7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 19,
+        "score": 0.7369620203971863,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030478
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.1 Norms for Approval of Group Housing Plan::0",
+        "text": "12.1 \nNorms for Approval of Group Housing Plan  \n \nThe following norms shall be adopted while approving the layout plan for group housing:- \ni) \nThe boundary roads if any must have a minimum width of 12 mtr. \nii) \nThe FAR should be considered with reference to the width of the public road abutting the \nproperty and the FAR should be calculated after deducting the area reserved for parks, \nopen spaces and civic amenities. \niii) \nThe set-backs should be provided with reference to depth and width of total plot area. \niv) \nThe coverage shall be with reference to total area of the layout. \nv) \nThe distance between the buildings should be a minimum of half of the hieght of the \ntallest building. \nvi) \n25% of the total area be reserved for CA, parks and open spaces, subject to a minimum \nof 15% for parks and open space. \nvii) \nThe means of access to the building blocks in the area of group housing shall be as \nfollows: \n \n \n \nAccess length in mtrs.                   \nMin. width \n \na) \nLess than 100 mtrs. \n6 mtrs. \n \nb) \n100 to 200 mtrs. \n9 mtrs. \n \nc) \nMore than 200 mtrs. \n12 mtrs. \n \nvii) \nThe area reserved for Parks and Open spaces, CA and roads (other than internal access \nin each sub-divided plot) shall be handed over free of cost to the B.D.A through registered \nrelinquishment deed before issue of work order.",
+        "clause_ref": "12.1 Norms for Approval of Group Housing Plan",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.6423167586326599,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030415
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::8.0 NOTE:    1)   Group housing means more than two buildings on a plot with one or more floors and::0",
+        "text": "8.0 \nNOTE:    1)   Group housing means more than two buildings on a plot with one or more floors and \nwith one or more dwelling units in each floor.  They are connected by an access of \nnot less than 3.5 mtrs. in width, if they are not approachable directly from the \nexisting roads. \n2) Where the sital area o group housing exceeds 4000 sq.mtrs. approval of layout \nshowing the general arrangement of residential building blocks, and dimesnsions of \nplot earmarked for each building blocks, means of access roads and civic amenity \nareas, should preceed the approval to building plan. \n3) In case, the height of group housing building exeed 9.5m, then set back to be left \nalround the premises shall be as er Table 23 or Table 25 whichever is higher.",
+        "clause_ref": "8.0 NOTE:    1)   Group housing means more than two buildings on a plot with one or more floors and",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.6330564022064209,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030366
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.2 Stipulations for group housing - Stipulations for group housing are indicated in the::0",
+        "text": "12.2 \nStipulations for group housing - Stipulations for group housing are indicated in the \nTable 9. \nTABLE 9 \n(Bye-law 12.0) \nGROUP HOUSING \n \nThe Table showing the maximum plot coverage FAR, minimum setbacks and minimum \nroad width for Group Housing is given below. \n \nPlot Area \nMinimum \nRoad \nwidth in \nMtrs. \nMaximum \nplot \ncoverage \nMaximum \nFAR \nMinimum Set-backs in Meters \n \n \n \n \nFront \nRear \nLeft \nRight \nUpto 0.40 Hectares \n12 \n60% \n2.00 \n5.0 \n4.5 \n4.5",
+        "clause_ref": "12.2 Stipulations for group housing - Stipulations for group housing are indicated in the",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.5574132204055786,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.02971
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "text": "0.50 \nOver 12.0 \nNote:  After leaving minimum set-backs as per the above table, if the remaining portion of the plot \ncannot be used for erecting the building, the Authority may insist the set backs applicable for \nresidential buildings.   \n \nTABLE 11 \n(Bye-law 13.2) \nREGULATIONS FOR FLATTED FACTORIES",
+        "clause_ref": "0.50 Over 12.0",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.5509517788887024,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029572
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.5182898044586182,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028259
+      }
+    ],
+    "building.width": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.6406442523002625,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032522
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.::0",
+        "text": "9.3.2 \nMinimum depth or width of a site for high rise buildings shall be 21 mtrs.  \n9.3.3.  Minimum road width facing a high rise building shall be 12mts.",
+        "clause_ref": "9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.6166431903839111,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.031746
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::5. Minimum road width::0",
+        "text": "5.  Minimum road width \n:",
+        "clause_ref": "5. Minimum road width",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 29,
+        "score": 0.596406102180481,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029644
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.0 Requirement of parts of building.::0",
+        "text": "20.0 \nRequirement of parts of building.",
+        "clause_ref": "20.0 Requirement of parts of building.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 38,
+        "score": 0.5425758361816406,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029514
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.1 Norms for Approval of Group Housing Plan::0",
+        "text": "12.1 \nNorms for Approval of Group Housing Plan  \n \nThe following norms shall be adopted while approving the layout plan for group housing:- \ni) \nThe boundary roads if any must have a minimum width of 12 mtr. \nii) \nThe FAR should be considered with reference to the width of the public road abutting the \nproperty and the FAR should be calculated after deducting the area reserved for parks, \nopen spaces and civic amenities. \niii) \nThe set-backs should be provided with reference to depth and width of total plot area. \niv) \nThe coverage shall be with reference to total area of the layout. \nv) \nThe distance between the buildings should be a minimum of half of the hieght of the \ntallest building. \nvi) \n25% of the total area be reserved for CA, parks and open spaces, subject to a minimum \nof 15% for parks and open space. \nvii) \nThe means of access to the building blocks in the area of group housing shall be as \nfollows: \n \n \n \nAccess length in mtrs.                   \nMin. width \n \na) \nLess than 100 mtrs. \n6 mtrs. \n \nb) \n100 to 200 mtrs. \n9 mtrs. \n \nc) \nMore than 200 mtrs. \n12 mtrs. \n \nvii) \nThe area reserved for Parks and Open spaces, CA and roads (other than internal access \nin each sub-divided plot) shall be handed over free of cost to the B.D.A through registered \nrelinquishment deed before issue of work order.",
+        "clause_ref": "12.1 Norms for Approval of Group Housing Plan",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.643645703792572,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.02938
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::6. Minimum road width::0",
+        "text": "6. Minimum road width \n:",
+        "clause_ref": "6. Minimum road width",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.5890079736709595,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029211
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.10.8 Buildings for cinemas - Setbacks and other requirements for permanent or other::0",
+        "text": "9.10.8  Buildings for cinemas - Setbacks and other requirements for permanent or other \ncinema buildings shall be in accordance with the Karnataka Cinemas (Regulation) Act \n1964 and the rules made there under.  No building other than a cinema theatre shall be \npermitted on the sites of cinema theatres unless such buildings are permissible under the \nabove said Act.   \n9 .10.9 Minimum Road Width for Kalyana Mantapas –  \nTABLE -  6A \nSite Area \nMinimum Road width \na) Upto 250 Sq.Mtrs.",
+        "clause_ref": "9.10.8 Buildings for cinemas - Setbacks and other requirements for permanent or other",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 29,
+        "score": 0.5404868721961975,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028898
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less::0",
+        "text": "7.2 \nNo Plan shall be sanctioned for a residential detached building on a plot measuring less \nthan 50 sqm. or having width less than 6 metres.  In specific cases of sites for housing \nschemes for EWS, LIG, Slum Clearance and Improvement Schemes as well as \nreconstruction in case of densely populated areas, and plot sub-divided due to family \npartitions,  the Authority may relax the above conditions.",
+        "clause_ref": "7.2 No Plan shall be sanctioned for a residential detached building on a plot measuring less",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 19,
+        "score": 0.5777802467346191,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028405
+      }
+    ],
+    "building.depth": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "text": "Building Bye-Laws – 2003 \n \n \n \n \n10\n \ne) the position of the adjacent plots whether vacant or built up; \n \nf) \nthe area to be occupied by the proposed building and the set backs proposed for \nproper air and ventilation; \n \ng) the nature of the ground on which the proposed building is to be erected, whether \nnatural like, rocky, gravelly, clayey, sandy etc., or made up ground. In the case of \nmade up ground, the time when it was so made up and the materials used in \nmaking it up shall be indicated.  In case of sloping ground where the gradient \nexceeds 5% (1:20) block levels have to be furnished in the site plan; \n \nh) any physical features such as wells, drains, transmission lines, etc.; \n \ni) \nnatural features like existing trees, ridges, valleys etc., \n \nj) \nblock levels in cases where basement/cellar floors are proposed below ground \nlevel; \n \nk) such other particulars, as may be specified by the Authority. \n3.2.(5.3) Building plan – Building plan drawn to a scale of not more than 1:100 showing the \nfollowing particulars, namely \n \na)  floor plans of all floors indicating north line and the various parts of the building, \nsizes of rooms, position of stair-cases and lifts, machine rooms, ramps etc., in \ndetail along with street elevation;. \nb) use or occupancy of all parts of the building; \nc) exact location of essential services viz., water closets, baths, sinks, etc; \nd) sectional drawing showing sizes of footing, thickness of walls, spacing of columns, \nthickness of roof slab, height of  rooms, height of parapet, drainage and slope of \nthe terrace roof details of staircase showing tread, rise and landing width, railing, \netc; \ne) details of ventilation of all rooms; \nf) \nopen spaces or yards inside or surrounding the buildings; \ng) sewerage arrangements; \nh) the schedule of all doors, windows, and ventilators showing sizes and numbers; \ni) \ndimensions of projected portions beyond the walls like chajja, balcony, canopy, etc; \nj) \nin case of basement floor, position of the ramp with respect to the entrance, ground \nlevel and building, with a slope not exceeding 1 to 10, the drainage arrangements \nin the basement floor, etc; \nk) arrangements for vehicular parking as per standards laid down in bye-law 16.0 \nindicating the entry, exit of vehicles, drive way, etc; \nl) \nsuch other particulars like, site area, plinth area of all buildings, areas of each floor \nand total floor area, building coverage, total height of building, etc shall be \nindicated;",
+        "clause_ref": "UNCATEGORISED",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 10,
+        "score": 0.5465420484542847,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.054357
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.::0",
+        "text": "9.3.2 \nMinimum depth or width of a site for high rise buildings shall be 21 mtrs.  \n9.3.3.  Minimum road width facing a high rise building shall be 12mts.",
+        "clause_ref": "9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.6594346761703491,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032522
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.5766162872314453,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.03101
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::25.0 TELECOM SERVICES.::0",
+        "text": "25.0 \nTELECOM SERVICES. \na) \nEvery Residential / Commercial premises should provide an access path for leading \ncopper / optical fibre cable to the building from outside the compound to the building: \nb) \nA single 32mm GI pipe buried at a minimum depth of 60 cms from the compound wall \nto the access point inside the building. A hand hole of 0.60 x 0.60 x 0.60m at the \noutside of the compound wall where the pipe has been terminated should be provided. \nc) \nIn case of multistoreyed residential / business premises, minimum 2 pipes, one of \n32mm and 2nd one of 60mm dia should be laid at a minimum depth of 60 cms with \nhand hole at the boundary of the compound towards the street / road. \nd) \nThe buildings should be completely pre wired within using concealed conduits for their \ncommunication requirements. \ne) \nIn case of the Multi-storeyed building a separate room preferably 4.50 x 3.65m may be \nprovided  in the basement for installation of telecom equipment. The room should have",
+        "clause_ref": "25.0 TELECOM SERVICES.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 47,
+        "score": 0.5318846702575684,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030478
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.0 Requirement of parts of building.::0",
+        "text": "20.0 \nRequirement of parts of building.",
+        "clause_ref": "20.0 Requirement of parts of building.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 38,
+        "score": 0.5691587924957275,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.03031
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.1 Norms for Approval of Group Housing Plan::0",
+        "text": "12.1 \nNorms for Approval of Group Housing Plan  \n \nThe following norms shall be adopted while approving the layout plan for group housing:- \ni) \nThe boundary roads if any must have a minimum width of 12 mtr. \nii) \nThe FAR should be considered with reference to the width of the public road abutting the \nproperty and the FAR should be calculated after deducting the area reserved for parks, \nopen spaces and civic amenities. \niii) \nThe set-backs should be provided with reference to depth and width of total plot area. \niv) \nThe coverage shall be with reference to total area of the layout. \nv) \nThe distance between the buildings should be a minimum of half of the hieght of the \ntallest building. \nvi) \n25% of the total area be reserved for CA, parks and open spaces, subject to a minimum \nof 15% for parks and open space. \nvii) \nThe means of access to the building blocks in the area of group housing shall be as \nfollows: \n \n \n \nAccess length in mtrs.                   \nMin. width \n \na) \nLess than 100 mtrs. \n6 mtrs. \n \nb) \n100 to 200 mtrs. \n9 mtrs. \n \nc) \nMore than 200 mtrs. \n12 mtrs. \n \nvii) \nThe area reserved for Parks and Open spaces, CA and roads (other than internal access \nin each sub-divided plot) shall be handed over free of cost to the B.D.A through registered \nrelinquishment deed before issue of work order.",
+        "clause_ref": "12.1 Norms for Approval of Group Housing Plan",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.5975097417831421,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028958
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as::0",
+        "text": "9.3.1 \nIn the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as \nin Table 5.",
+        "clause_ref": "9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.53072589635849,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.027778
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.9 Industrial buildings - The minimum height of rooms shall be as provided in the Factory::0",
+        "text": "20.9 \nIndustrial buildings - The minimum height of rooms shall be as provided in the Factory \nAct, 1948 and rules made thereunder.",
+        "clause_ref": "20.9 Industrial buildings - The minimum height of rooms shall be as provided in the Factory",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 41,
+        "score": 0.6415717005729675,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.016129
+      }
+    ],
+    "road.width": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::8.1 The means of exclusive access other than thorough public roads and streets, shall not be::0",
+        "text": "8.1 \nThe means of exclusive access other than thorough public roads and streets, shall not be \nof more than 30 meters in length from a public road or street. The minimum width of such \naccess shall be 3.5 meters.  F.A.R. and height of buildings coming up on such plots \nconnected by means of exclusive access shall be regulated according to the width of \npublic street or road. If the means of access exceeds 30.00 mtrs in length, FAR shall be \nregulated with reference to the width of such access road. Construction of buildings on \nplots with common access / lanes from the public road / street shall be regulated \naccording to the width of such common access roads / lanes.",
+        "clause_ref": "8.1 The means of exclusive access other than thorough public roads and streets, shall not be",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 20,
+        "score": 0.6953986883163452,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032266
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::5. Minimum road width::0",
+        "text": "5.  Minimum road width \n:",
+        "clause_ref": "5. Minimum road width",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 29,
+        "score": 0.7383513450622559,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.031778
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::6. Minimum road width::0",
+        "text": "6. Minimum road width \n:",
+        "clause_ref": "6. Minimum road width",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.7226295471191406,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.031281
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::8.5 The means of access shall be clearly shown in the plans submitted indicating the width,::0",
+        "text": "8.5 \nThe means of access shall be clearly shown in the plans submitted indicating the width, \nlength from the public road, width of the public road from which the access is taken etc.",
+        "clause_ref": "8.5 The means of access shall be clearly shown in the plans submitted indicating the width,",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 20,
+        "score": 0.6103814840316772,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.031054
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.::0",
+        "text": "9.3.2 \nMinimum depth or width of a site for high rise buildings shall be 21 mtrs.  \n9.3.3.  Minimum road width facing a high rise building shall be 12mts.",
+        "clause_ref": "9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.6037695407867432,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030366
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.1 Norms for Approval of Group Housing Plan::0",
+        "text": "12.1 \nNorms for Approval of Group Housing Plan  \n \nThe following norms shall be adopted while approving the layout plan for group housing:- \ni) \nThe boundary roads if any must have a minimum width of 12 mtr. \nii) \nThe FAR should be considered with reference to the width of the public road abutting the \nproperty and the FAR should be calculated after deducting the area reserved for parks, \nopen spaces and civic amenities. \niii) \nThe set-backs should be provided with reference to depth and width of total plot area. \niv) \nThe coverage shall be with reference to total area of the layout. \nv) \nThe distance between the buildings should be a minimum of half of the hieght of the \ntallest building. \nvi) \n25% of the total area be reserved for CA, parks and open spaces, subject to a minimum \nof 15% for parks and open space. \nvii) \nThe means of access to the building blocks in the area of group housing shall be as \nfollows: \n \n \n \nAccess length in mtrs.                   \nMin. width \n \na) \nLess than 100 mtrs. \n6 mtrs. \n \nb) \n100 to 200 mtrs. \n9 mtrs. \n \nc) \nMore than 200 mtrs. \n12 mtrs. \n \nvii) \nThe area reserved for Parks and Open spaces, CA and roads (other than internal access \nin each sub-divided plot) shall be handed over free of cost to the B.D.A through registered \nrelinquishment deed before issue of work order.",
+        "clause_ref": "12.1 Norms for Approval of Group Housing Plan",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.6613360643386841,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.03009
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.5537363290786743,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029324
+      },
+      {
+        "chunk_id": "BBMP::10963 Greater Bengaluru Area (Parking)Rules, 2026..pdf::12. Residential::0",
+        "text": "12.  Residential \nparking \non-street.- \n(1) Owners of residential \nbuildings shall make adequate provision within their premises for \nparking of vehicles of their household and/or tenants in compliance with \nthe building bye-laws. \n \n(2) Residential parking on streets other than arterial and sub-\narterial roads may be allowed only for owners of those vehicles issued \nwith a residential parking permit in accordance with sub rule (4) by the \ncity corporation for a fee as specified in rule 13.  \n \n(3) On roads identified as collector roads by the city corporation, \nresidential parking may be permitted provided a minimum space of 6 m \nis available for circulation of traffic and a minimum of 1.8m of clear \nwalking space is available as footpath on both sides of the road, even \nafter a vehicle is parked. On local roads, a minimum space of 4 m shall \nbe available for circulation of traffic and a minimum of 1.8m of clear \nwalking space shall be available as footpath atleast on one side, after a \nvehicle is parked.  \n \n(4) Residential parking permits may be issued against a vehicle and \na name associated with that vehicle number only for those such \nresidents living in residential buildings that are not in violation of \nminimum parking requirements specified in the building bye-laws. Any \npermits issued to a resident shall be valid for not more than one year \nand may be renewed every year by the city corporation after verifying \nthat the beneficiary continues to reside in the area. A residential parking \npermit issued to an individual shall be valid for parking their vehicle on \nroads designated for residential parking that are within a walkable \ndistance from the location of their residence as may be specified through \nnotification by the Chief Commissioner, from time-to-time. If a permit \nholder parks his vehicle outside the permitted area then it shall be \nconsidered as a violation. \n(5) The Chief Commissioner shall issue regulation or notification \non the uniform procedure to be followed by the city corporations for \nissuing residential parking permits and addressing of grievances \npertaining to permits as per the guidance enshrined in the Parking \nPolicy 2.0 for Bengaluru and in compliance with these rules. City \ncorporations may issue permits as per the regulations or notification \nissued by the Greater Bengaluru Authority.",
+        "clause_ref": "12. Residential",
+        "source_file": "10963 Greater Bengaluru Area (Parking)Rules, 2026..pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\10963 Greater Bengaluru Area (Parking)Rules, 2026..pdf",
+        "doc_type": "UNKNOWN",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 10,
+        "score": 0.6206340789794922,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028309
+      }
+    ],
+    "setbacks.front": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "text": "Building Bye-Laws – 2003 \n \n \n \n23\n \nTABLE 5 \n(Bye-law 9.2) \n \nEXTERIOR OPEN SPACES/SET-BACKS FOR RESIDENTIAL, COMMERCIAL, PUBLIC AND \nSEMI-PUBLIC, TRAFFIC & TRANSPORTATION , PUBLIC UTILITY BUILDINGS  \n– ABOVE 9.5 MTS. IN HEIGHT \n \nSl. No. \nHeight of Building in mtrs.  \nExterior open spaces /      \nset-backs to be left on all \nsides (Front, Rear and Sides) \nin mtrs. \n1 \nAbove 9.5 upto 12 \n4.5 \n2 \nAbove 12 upto 15 \n5.0 \n3 \nAbove 15 upto 18 \n6.0 \n4 \nAbove 18 upto 21 \n7.0 \n5 \nAbove 21 upto 24 \n8.0 \n6 \nAbove 24 upto 27 \n9.0 \n7 \nAbove 27 upto 30 \n10.0 \n8 \nAbove 30 upto 35 \n11.0 \n9 \nAbove 35 upto 40 \n12.0 \n10 \nAbove 40 upto 45 \n13.0 \n11 \nAbove 45 upto 50 \n14.0 \n12 \nAbove 50 \n16.0",
+        "clause_ref": "UNCATEGORISED",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 23,
+        "score": 0.508752703666687,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.069471
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+        "text": "4. Minimum setbacks \n: \na. Front 8.0 mtrs. \nb. Rear 4.5 mtrs. \nc. Sides 4.5 mtrs. \n \nNote:  If the height of the building exceeds 9.5 metres, the minimum set back shall be the higher \nof the two in  Tables 5 and 11.",
+        "clause_ref": "4. Minimum setbacks",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.6654645204544067,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032522
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "text": "0.50 \nOver 12.0 \nNote:  After leaving minimum set-backs as per the above table, if the remaining portion of the plot \ncannot be used for erecting the building, the Authority may insist the set backs applicable for \nresidential buildings.   \n \nTABLE 11 \n(Bye-law 13.2) \nREGULATIONS FOR FLATTED FACTORIES",
+        "clause_ref": "0.50 Over 12.0",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.5631780624389648,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029911
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::3.10 Exemptions for ground rent -::0",
+        "text": "3.10 \nExemptions for ground rent - \nGround rent may be exempted in the following cases, namely \n(1)  \nindividual residential bungalows with front set back of 6 metres and more with coverage of \nnot more than 55 per cent. \n(2)  \nschools, colleges and other institutions with a front set back of 8 meters and more with \ncoverage of not more than 33.33 per cent. \n(3)  \nreligious and cultural buildings with a front set back of 8 meters and more with coverage \nof not more than 45 per cent. \n(4)  \nheavy industries and Government buildings with large extents of land capable of storing \nthe building materials within the periphery of the property.  \nNote:  Exemption shall be granted only on production of undertaking from the applicant on a \nstamped paper of Rs. 30 that the Corporation land, footpath and road will not be used for \nstocking building materials as well as depositing debris and in case of violation of this \ncondition, they shall be liable to pay the ground rent at the normal rates in addition to the \npenalty of 50 % of the amount specified which will be recovered as arrears of tax on land \nand buildings, etc.",
+        "clause_ref": "3.10 Exemptions for ground rent -",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 15,
+        "score": 0.5344328880310059,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029631
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as::0",
+        "text": "9.3.1 \nIn the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as \nin Table 5.",
+        "clause_ref": "9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.6062471866607666,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028787
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.4802756905555725,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028373
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.::0",
+        "text": "9.3.2 \nMinimum depth or width of a site for high rise buildings shall be 21 mtrs.  \n9.3.3.  Minimum road width facing a high rise building shall be 12mts.",
+        "clause_ref": "9.3.2 Minimum depth or width of a site for high rise buildings shall be 21 mtrs.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.5066644549369812,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.026876
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.5 Provision of ramp in setback :::0",
+        "text": "9.5  \nProvision of ramp in setback :  \nA ramp provided from surface level of the site to the basement floor shall have a \nminimum width of 3.50 meters and slope of not more than 1 in 10. The ramp shall have a \nmargin of two meters kept free from the adjacent properties.  The gradient of a ramp shall \nstart after leaving a minimum distance of one metres from the front boundary of the plot.",
+        "clause_ref": "9.5 Provision of ramp in setback :",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 10.399576590137972,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.016393
+      }
+    ],
+    "setbacks.rear": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "text": "Building Bye-Laws – 2003 \n \n \n \n23\n \nTABLE 5 \n(Bye-law 9.2) \n \nEXTERIOR OPEN SPACES/SET-BACKS FOR RESIDENTIAL, COMMERCIAL, PUBLIC AND \nSEMI-PUBLIC, TRAFFIC & TRANSPORTATION , PUBLIC UTILITY BUILDINGS  \n– ABOVE 9.5 MTS. IN HEIGHT \n \nSl. No. \nHeight of Building in mtrs.  \nExterior open spaces /      \nset-backs to be left on all \nsides (Front, Rear and Sides) \nin mtrs. \n1 \nAbove 9.5 upto 12 \n4.5 \n2 \nAbove 12 upto 15 \n5.0 \n3 \nAbove 15 upto 18 \n6.0 \n4 \nAbove 18 upto 21 \n7.0 \n5 \nAbove 21 upto 24 \n8.0 \n6 \nAbove 24 upto 27 \n9.0 \n7 \nAbove 27 upto 30 \n10.0 \n8 \nAbove 30 upto 35 \n11.0 \n9 \nAbove 35 upto 40 \n12.0 \n10 \nAbove 40 upto 45 \n13.0 \n11 \nAbove 45 upto 50 \n14.0 \n12 \nAbove 50 \n16.0",
+        "clause_ref": "UNCATEGORISED",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 23,
+        "score": 0.520355761051178,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.043956
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+        "text": "4. Minimum setbacks \n: \na. Front 8.0 mtrs. \nb. Rear 4.5 mtrs. \nc. Sides 4.5 mtrs. \n \nNote:  If the height of the building exceeds 9.5 metres, the minimum set back shall be the higher \nof the two in  Tables 5 and 11.",
+        "clause_ref": "4. Minimum setbacks",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.6977542638778687,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032787
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "text": "0.50 \nOver 12.0 \nNote:  After leaving minimum set-backs as per the above table, if the remaining portion of the plot \ncannot be used for erecting the building, the Authority may insist the set backs applicable for \nresidential buildings.   \n \nTABLE 11 \n(Bye-law 13.2) \nREGULATIONS FOR FLATTED FACTORIES",
+        "clause_ref": "0.50 Over 12.0",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.5645265579223633,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030835
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.2 Stipulations for group housing - Stipulations for group housing are indicated in the::0",
+        "text": "12.2 \nStipulations for group housing - Stipulations for group housing are indicated in the \nTable 9. \nTABLE 9 \n(Bye-law 12.0) \nGROUP HOUSING \n \nThe Table showing the maximum plot coverage FAR, minimum setbacks and minimum \nroad width for Group Housing is given below. \n \nPlot Area \nMinimum \nRoad \nwidth in \nMtrs. \nMaximum \nplot \ncoverage \nMaximum \nFAR \nMinimum Set-backs in Meters \n \n \n \n \nFront \nRear \nLeft \nRight \nUpto 0.40 Hectares \n12 \n60% \n2.00 \n5.0 \n4.5 \n4.5",
+        "clause_ref": "12.2 Stipulations for group housing - Stipulations for group housing are indicated in the",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 0.47769811749458313,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029514
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::7. Setbacks min.::0",
+        "text": "7. Setbacks min.  \nFront \n: \n2.00 m \n \nRear \n: \n1.50 m \n \nSide \n: \n2.00 only for end units",
+        "clause_ref": "7. Setbacks min.",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 30,
+        "score": 0.5191491842269897,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.02901
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as::0",
+        "text": "9.3.1 \nIn the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as \nin Table 5.",
+        "clause_ref": "9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.5616853833198547,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.02886
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.4604055881500244,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.02886
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.5 Provision of ramp in setback :::0",
+        "text": "9.5  \nProvision of ramp in setback :  \nA ramp provided from surface level of the site to the basement floor shall have a \nminimum width of 3.50 meters and slope of not more than 1 in 10. The ramp shall have a \nmargin of two meters kept free from the adjacent properties.  The gradient of a ramp shall \nstart after leaving a minimum distance of one metres from the front boundary of the plot.",
+        "clause_ref": "9.5 Provision of ramp in setback :",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.4596644341945648,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028205
+      }
+    ],
+    "setbacks.left": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "text": "Building Bye-Laws – 2003 \n \n \n \n23\n \nTABLE 5 \n(Bye-law 9.2) \n \nEXTERIOR OPEN SPACES/SET-BACKS FOR RESIDENTIAL, COMMERCIAL, PUBLIC AND \nSEMI-PUBLIC, TRAFFIC & TRANSPORTATION , PUBLIC UTILITY BUILDINGS  \n– ABOVE 9.5 MTS. IN HEIGHT \n \nSl. No. \nHeight of Building in mtrs.  \nExterior open spaces /      \nset-backs to be left on all \nsides (Front, Rear and Sides) \nin mtrs. \n1 \nAbove 9.5 upto 12 \n4.5 \n2 \nAbove 12 upto 15 \n5.0 \n3 \nAbove 15 upto 18 \n6.0 \n4 \nAbove 18 upto 21 \n7.0 \n5 \nAbove 21 upto 24 \n8.0 \n6 \nAbove 24 upto 27 \n9.0 \n7 \nAbove 27 upto 30 \n10.0 \n8 \nAbove 30 upto 35 \n11.0 \n9 \nAbove 35 upto 40 \n12.0 \n10 \nAbove 40 upto 45 \n13.0 \n11 \nAbove 45 upto 50 \n14.0 \n12 \nAbove 50 \n16.0",
+        "clause_ref": "UNCATEGORISED",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 23,
+        "score": 0.5309152603149414,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.082753
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::7. Side set back for plots joined at the::0",
+        "text": "7.  Side set back for plots joined at the \nside \n: \nOn a plot on which a semi detached building \nis proposed the left and the right side \nsetbacks shall be the same as required for \nthe total width of the combined plot treating \nit is an individual site",
+        "clause_ref": "7. Side set back for plots joined at the",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 29,
+        "score": 0.6013187766075134,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032522
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::10.0 Semi-detached houses (back to back or side to side) - Setbacks, coverage, floor area::0",
+        "text": "10.0  \nSemi-detached houses (back to back or side to side) - Setbacks, coverage, floor area \nratio and road width in respect of semi-detached houses shall be as indicated in Table 7. \nTABLE 7 \n(Bye-law 10.0) \nSEMI-DETACHED HOUSES \n(back to back or side to side)",
+        "clause_ref": "10.0 Semi-detached houses (back to back or side to side) - Setbacks, coverage, floor area",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 29,
+        "score": 0.5666235685348511,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030579
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "text": "0.50 \nOver 12.0 \nNote:  After leaving minimum set-backs as per the above table, if the remaining portion of the plot \ncannot be used for erecting the building, the Authority may insist the set backs applicable for \nresidential buildings.   \n \nTABLE 11 \n(Bye-law 13.2) \nREGULATIONS FOR FLATTED FACTORIES",
+        "clause_ref": "0.50 Over 12.0",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.539017915725708,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029911
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.45775431394577026,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029206
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+        "text": "4. Minimum setbacks \n: \na. Front 8.0 mtrs. \nb. Rear 4.5 mtrs. \nc. Sides 4.5 mtrs. \n \nNote:  If the height of the building exceeds 9.5 metres, the minimum set back shall be the higher \nof the two in  Tables 5 and 11.",
+        "clause_ref": "4. Minimum setbacks",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.623005747795105,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.016393
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::14.3 Balcony - The projection of the balcony shall be measured perpendicular to the building::0",
+        "text": "14.3 \nBalcony - The projection of the balcony shall be measured perpendicular to the building \nupto the outermost edge of the balcony.  Cantilever projection of the balcony shall be \npermitted not exceeding 1/3 of the setback subject to a maximum of 1.1 mtrs. in the first \nfloor and 1.75 metres in and above the second floor.  No balcony is allowed at the ground \nfloor level.   The length of the balcony shall be limited to 1/3 of  the length of each side of \nthe building.",
+        "clause_ref": "14.3 Balcony - The projection of the balcony shall be measured perpendicular to the building",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 33,
+        "score": 7.539162043399294,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.016129
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::12.2 Stipulations for group housing - Stipulations for group housing are indicated in the::0",
+        "text": "12.2 \nStipulations for group housing - Stipulations for group housing are indicated in the \nTable 9. \nTABLE 9 \n(Bye-law 12.0) \nGROUP HOUSING \n \nThe Table showing the maximum plot coverage FAR, minimum setbacks and minimum \nroad width for Group Housing is given below. \n \nPlot Area \nMinimum \nRoad \nwidth in \nMtrs. \nMaximum \nplot \ncoverage \nMaximum \nFAR \nMinimum Set-backs in Meters \n \n \n \n \nFront \nRear \nLeft \nRight \nUpto 0.40 Hectares \n12 \n60% \n2.00 \n5.0 \n4.5 \n4.5",
+        "clause_ref": "12.2 Stipulations for group housing - Stipulations for group housing are indicated in the",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 31,
+        "score": 7.461563578527173,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.015625
+      }
+    ],
+    "setbacks.right": [
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "text": "Building Bye-Laws – 2003 \n \n \n \n23\n \nTABLE 5 \n(Bye-law 9.2) \n \nEXTERIOR OPEN SPACES/SET-BACKS FOR RESIDENTIAL, COMMERCIAL, PUBLIC AND \nSEMI-PUBLIC, TRAFFIC & TRANSPORTATION , PUBLIC UTILITY BUILDINGS  \n– ABOVE 9.5 MTS. IN HEIGHT \n \nSl. No. \nHeight of Building in mtrs.  \nExterior open spaces /      \nset-backs to be left on all \nsides (Front, Rear and Sides) \nin mtrs. \n1 \nAbove 9.5 upto 12 \n4.5 \n2 \nAbove 12 upto 15 \n5.0 \n3 \nAbove 15 upto 18 \n6.0 \n4 \nAbove 18 upto 21 \n7.0 \n5 \nAbove 21 upto 24 \n8.0 \n6 \nAbove 24 upto 27 \n9.0 \n7 \nAbove 27 upto 30 \n10.0 \n8 \nAbove 30 upto 35 \n11.0 \n9 \nAbove 35 upto 40 \n12.0 \n10 \nAbove 40 upto 45 \n13.0 \n11 \nAbove 45 upto 50 \n14.0 \n12 \nAbove 50 \n16.0",
+        "clause_ref": "UNCATEGORISED",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 23,
+        "score": 0.5111612677574158,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.069272
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::7. Side set back for plots joined at the::0",
+        "text": "7.  Side set back for plots joined at the \nside \n: \nOn a plot on which a semi detached building \nis proposed the left and the right side \nsetbacks shall be the same as required for \nthe total width of the combined plot treating \nit is an individual site",
+        "clause_ref": "7. Side set back for plots joined at the",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 29,
+        "score": 0.6041849851608276,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.032522
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::10.0 Semi-detached houses (back to back or side to side) - Setbacks, coverage, floor area::0",
+        "text": "10.0  \nSemi-detached houses (back to back or side to side) - Setbacks, coverage, floor area \nratio and road width in respect of semi-detached houses shall be as indicated in Table 7. \nTABLE 7 \n(Bye-law 10.0) \nSEMI-DETACHED HOUSES \n(back to back or side to side)",
+        "clause_ref": "10.0 Semi-detached houses (back to back or side to side) - Setbacks, coverage, floor area",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 29,
+        "score": 0.5569106936454773,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.030366
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "text": "0.50 \nOver 12.0 \nNote:  After leaving minimum set-backs as per the above table, if the remaining portion of the plot \ncannot be used for erecting the building, the Authority may insist the set backs applicable for \nresidential buildings.   \n \nTABLE 11 \n(Bye-law 13.2) \nREGULATIONS FOR FLATTED FACTORIES",
+        "clause_ref": "0.50 Over 12.0",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.540496826171875,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.029911
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "text": "20.6 \nStair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-\ncases for buildings shall be as given below: \nThe Minimum width of stair cases shall be as follows, \n \na) Residential buildings (dwellings) \n                             \n \n1.0 mtr. \nNote: For row housing with two storeys, the minimum width shall be          0.75 mtr. \nb) \nResidential hostel buildings \n1.5 mtr. \nc)  \nAssembly building like auditoria, theatres and cinemas  \n1.5 mtr. \nd) \nEducational building upto 24 mtrs in height  \n1.5 mtr. \ne) \nEducational building more than 24 mtr. in height \n2.0 mtr. \nf) \nInstitutional buildings upto 10 beds \n1.5 mtr. \ng) \nInstitutional buildings more than 10 beds \n2.0 mtr. \nh) \nAll other buildings \n1.5 mtr. \n \nThe minimum width of tread without nosing shall be 25 cm. for residential buildings.  The \nminimum width of tread for other buildings shall be 30 cm. \nMaximum riser shall be 19 cm. for residential buildings and 15 cm. for other buildings and \nthey shall be limited to 15 per flight. \n \n(2) The minimum clear head room in a stair case shall be 2.2 mtr.",
+        "clause_ref": "20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 40,
+        "score": 0.4514288902282715,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.028372
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.5 Provision of ramp in setback :::0",
+        "text": "9.5  \nProvision of ramp in setback :  \nA ramp provided from surface level of the site to the basement floor shall have a \nminimum width of 3.50 meters and slope of not more than 1 in 10. The ramp shall have a \nmargin of two meters kept free from the adjacent properties.  The gradient of a ramp shall \nstart after leaving a minimum distance of one metres from the front boundary of the plot.",
+        "clause_ref": "9.5 Provision of ramp in setback :",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 0.45287764072418213,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.027864
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+        "text": "4. Minimum setbacks \n: \na. Front 8.0 mtrs. \nb. Rear 4.5 mtrs. \nc. Sides 4.5 mtrs. \n \nNote:  If the height of the building exceeds 9.5 metres, the minimum set back shall be the higher \nof the two in  Tables 5 and 11.",
+        "clause_ref": "4. Minimum setbacks",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 32,
+        "score": 0.6255924105644226,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.016393
+      },
+      {
+        "chunk_id": "BBMP::bangalore_dcr.pdf::9.4 Garages::0",
+        "text": "9.4 \nGarages \n9.4.1.  For the buildings upto a height of 9.50 metres, one garage may be permitted in the rear \nright hand corner of the plot without right and rear set backs, if the following requirements \nare fulfilled, namely \na) height of the garage does not exceed 3.00 Metres from the ground level; \nb) not more than one upper floor is proposed over such a garage; \nc) height of the garage and the upper floor, if any, is limited to 6.50 Metres from the \nground level; \nd) no other structure is proposed over upper floor of the garage; \ne) no openings are provided in the garage and its upper floor towards the \nneighbouring buildings; \nf) \nthe upper floor is accessible only from lower floor; \ng) not exceeding one side door is provided to the garage at the ground level \ntowards the rear setback  of the building; \nh) no other structures except one lumber room and a stair case are  provided in the \nrear side of the garage; \ni) \ndepth of the lumber room does not exceed 1.25 Metres; \nj) \nlength of the garage including the lumber room and stair case does not exceed \none third of the length of the site or      6 Metres, whichever is less; \nk) width of the garage  does not xceed 4 metres; \nl) \nthe distance from the outer surface of the garage to the plot boundary is not less \nthan 4.50 metres; \nm) in the case of corner plots, the garage is located at the rear corner diagonally \nopposite to the road intersection. \n9.4.2.  A Garage not exceeding 3.00 metres width may be permitted as part of the main building \nwith minimum setbacks applicable to such a building, provided such a garage is not  \nlocated at the intersection of roads in the case of corner sites. The length of the garage \nshall not exceed one third of the length of the corresponding side of the site or 6.00 \nmetres, whichever  is less.",
+        "clause_ref": "9.4 Garages",
+        "source_file": "bangalore_dcr.pdf",
+        "file_path": "D:\\BUILDCHECK_india_phase3_rag_compliance_full_pipeline\\build\\data\\regulations\\BBMP\\bangalore_dcr.pdf",
+        "doc_type": "DCR",
+        "city": "Bengaluru",
+        "municipality": "BBMP",
+        "page_num": 26,
+        "score": 8.821220696543099,
+        "retrieval_method": "hybrid",
+        "rrf_score": 0.016129
+      }
+    ]
+  },
+  "draft_rules": [
+    {
+      "rule": {
+        "rule_id": "bbmp-min-rear-setback-residential",
+        "municipality": "BBMP",
+        "citation": "4. Minimum setbacks",
+        "description": "Minimum rear setback for residential buildings",
+        "applies_when": {},
+        "threshold": {
+          "field": "setbacks.rear",
+          "op": ">=",
+          "value": 4.5,
+          "unit": "m"
+        },
+        "version": "0.0.0-draft"
+      },
+      "status": "DRAFT",
+      "source_chunk_ids": [
+        "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+        "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "BBMP::bangalore_dcr.pdf::12.2 Stipulations for group housing - Stipulations for group housing are indicated in the::0",
+        "BBMP::bangalore_dcr.pdf::7. Setbacks min.::0",
+        "BBMP::bangalore_dcr.pdf::9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as::0",
+        "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "BBMP::bangalore_dcr.pdf::9.5 Provision of ramp in setback :::0"
+      ],
+      "drafted_from_query": "minimum rear setback residential building",
+      "reviewer_notes": null,
+      "source_field": "setbacks.rear"
+    },
+    {
+      "rule": {
+        "rule_id": "bbmp-min-side-setback-residential",
+        "municipality": "BBMP",
+        "citation": "4. Minimum setbacks",
+        "description": "Minimum side setback for residential buildings up to 9.5m height",
+        "applies_when": {},
+        "threshold": {
+          "field": "setbacks.right",
+          "op": ">=",
+          "value": 4.5,
+          "unit": "m"
+        },
+        "version": "0.0.0-draft"
+      },
+      "status": "DRAFT",
+      "source_chunk_ids": [
+        "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+        "BBMP::bangalore_dcr.pdf::7. Side set back for plots joined at the::0",
+        "BBMP::bangalore_dcr.pdf::10.0 Semi-detached houses (back to back or side to side) - Setbacks, coverage, floor area::0",
+        "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+        "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+        "BBMP::bangalore_dcr.pdf::9.5 Provision of ramp in setback :::0",
+        "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+        "BBMP::bangalore_dcr.pdf::9.4 Garages::0"
+      ],
+      "drafted_from_query": "minimum right side setback residential building",
+      "reviewer_notes": null,
+      "source_field": "setbacks.right"
+    }
+  ],
+  "compliance": {
+    "overall_status": "FAIL",
+    "rule_results": [
+      {
+        "rule_id": "bbmp-min-rear-setback-residential",
+        "rule_description": "Minimum rear setback for residential buildings",
+        "status": "FAIL",
+        "observed_value": {
+          "value": 1.5,
+          "raw_value": null,
+          "normalized_value": {
+            "magnitude": 1.5,
+            "unit": "m"
+          },
+          "confidence": {
+            "level": "MEDIUM",
+            "score": null,
+            "reason": "Vision-only; CV did not resolve this field."
+          },
+          "source": "FINAL:VISION_ONLY",
+          "evidence": [],
+          "conflict": null
+        },
+        "required_value_description": "setbacks.rear >= 4.5 m",
+        "explanation": "Observed 1.5 does not satisfy requirement 'setbacks.rear >= 4.5 m'.",
+        "citation": "4. Minimum setbacks",
+        "source_field": "setbacks.rear",
+        "drafted_from_query": "minimum rear setback residential building",
+        "source_chunk_ids": [
+          "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+          "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+          "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+          "BBMP::bangalore_dcr.pdf::12.2 Stipulations for group housing - Stipulations for group housing are indicated in the::0",
+          "BBMP::bangalore_dcr.pdf::7. Setbacks min.::0",
+          "BBMP::bangalore_dcr.pdf::9.3.1 In the case of ‘high-rise buildings’ the minimum set-back all-round the building shall be as::0",
+          "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+          "BBMP::bangalore_dcr.pdf::9.5 Provision of ramp in setback :::0"
+        ]
+      },
+      {
+        "rule_id": "bbmp-min-side-setback-residential",
+        "rule_description": "Minimum side setback for residential buildings up to 9.5m height",
+        "status": "FAIL",
+        "observed_value": {
+          "value": 1.0,
+          "raw_value": null,
+          "normalized_value": {
+            "magnitude": 1.0,
+            "unit": "m"
+          },
+          "confidence": {
+            "level": "MEDIUM",
+            "score": null,
+            "reason": "Vision-only; CV did not resolve this field."
+          },
+          "source": "FINAL:VISION_ONLY",
+          "evidence": [],
+          "conflict": null
+        },
+        "required_value_description": "setbacks.right >= 4.5 m",
+        "explanation": "Observed 1.0 does not satisfy requirement 'setbacks.right >= 4.5 m'.",
+        "citation": "4. Minimum setbacks",
+        "source_field": "setbacks.right",
+        "drafted_from_query": "minimum right side setback residential building",
+        "source_chunk_ids": [
+          "BBMP::bangalore_dcr.pdf::UNCATEGORISED::0",
+          "BBMP::bangalore_dcr.pdf::7. Side set back for plots joined at the::0",
+          "BBMP::bangalore_dcr.pdf::10.0 Semi-detached houses (back to back or side to side) - Setbacks, coverage, floor area::0",
+          "BBMP::bangalore_dcr.pdf::0.50 Over 12.0::0",
+          "BBMP::bangalore_dcr.pdf::20.6 Stair-case (1) The Minimum clear width, minimum tread and maximum riser of stair-::0",
+          "BBMP::bangalore_dcr.pdf::9.5 Provision of ramp in setback :::0",
+          "BBMP::bangalore_dcr.pdf::4. Minimum setbacks::0",
+          "BBMP::bangalore_dcr.pdf::9.4 Garages::0"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1176 @@
+{
+  "document_id": "PLAN5",
+  "cv_warnings": [
+    "page 1: picked a candidate rectangle (8 candidate(s) considered near the site-plan anchor, score=0.5), but found NO numeric label within range on either its horizontal or vertical edges (see `_pick_edge_dimension`'s distance/overlap/road-exclusion checks) -- plot.width and plot.depth cannot be resolved. Since scale (pt/m) is derived from plot.width/plot.depth, this also blocks building.width/depth and all 4 setbacks even if a nested building rectangle exists."
+  ],
+  "vision_warnings": [
+    "page 1: vision analysis failed: Task error: File reconstruction error: Internal Writer Error: Background writer channel closed"
+  ],
+  "fields": [
+    {
+      "field": "plot.width",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "plot.depth",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "building.width",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "building.depth",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "road.width",
+      "cv_value_m": 10.0,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "CV_ONLY",
+      "cv_source": "NATIVE_TEXT",
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": "CV resolved this field; Vision did not emit a semantic value."
+    },
+    {
+      "field": "setbacks.front",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "setbacks.rear",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "setbacks.left",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "setbacks.right",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": null,
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "plot.area",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": "m2",
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "building.footprint_area",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": "m2",
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "coverage",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": "m2",
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "far.area",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": "m2",
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "far",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": "m2",
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    },
+    {
+      "field": "building.gross_built_up_area",
+      "cv_value_m": null,
+      "vision_value_m": null,
+      "absolute_difference_m": null,
+      "tolerance_m": null,
+      "cv_value": null,
+      "vision_value": null,
+      "absolute_difference": null,
+      "tolerance": null,
+      "unit": "m2",
+      "status": "MISSING",
+      "cv_source": null,
+      "vision_evidence": null,
+      "vision_confidence": null,
+      "note": null
+    }
+  ],
+  "summary": {
+    "AGREED": 0,
+    "CV_ONLY": 1,
+    "VISION_ONLY": 0,
+    "CONFLICT": 0,
+    "MISSING": 14
+  },
+  "cv_result": {
+    "document_id": "PLAN5",
+    "pages_analyzed": [
+      1
+    ],
+    "measurements": [
+      {
+        "field": "road.width",
+        "value_m": 10.0,
+        "value": null,
+        "unit": null,
+        "source": "NATIVE_TEXT",
+        "confidence": 0.99,
+        "evidence": [
+          "7.14X6.50 BELOW BELOW 10m WIDE ROAD WINDOW 1.20 X 1.20"
+        ],
+        "note": "Explicit road-width label; not inferred from the road rectangle.",
+        "page": 0,
+        "geometry_bbox_pts": [
+          875.3,
+          956.3,
+          1062.1,
+          1158.7
+        ]
+      }
+    ],
+    "warnings": [
+      "page 1: picked a candidate rectangle (8 candidate(s) considered near the site-plan anchor, score=0.5), but found NO numeric label within range on either its horizontal or vertical edges (see `_pick_edge_dimension`'s distance/overlap/road-exclusion checks) -- plot.width and plot.depth cannot be resolved. Since scale (pt/m) is derived from plot.width/plot.depth, this also blocks building.width/depth and all 4 setbacks even if a nested building rectangle exists."
+    ],
+    "site_plan_page": 1,
+    "site_plan_bbox_pts": [
+      875.3,
+      956.3,
+      1062.1,
+      1158.7
+    ],
+    "scale_points_per_metre": null,
+    "scale_confidence": null
+  },
+  "legacy_cv_plan": null,
+  "vision_result": {
+    "pages": [],
+    "model_name": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+    "enabled": true,
+    "warnings": [
+      "page 1: vision analysis failed: Task error: File reconstruction error: Internal Writer Error: Background writer channel closed"
+    ]
+  },
+  "final_agreed_values": {
+    "document_id": "PLAN5",
+    "values": {
+      "plot.width": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for plot.width."
+      },
+      "plot.depth": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for plot.depth."
+      },
+      "building.width": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for building.width."
+      },
+      "building.depth": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for building.depth."
+      },
+      "road.width": {
+        "value": 10.0,
+        "unit": "m",
+        "status": "CV_ONLY",
+        "source": "FINAL:CV_ONLY",
+        "confidence": "MEDIUM",
+        "reason": "CV-only; Vision did not emit this field."
+      },
+      "setbacks.front": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for setbacks.front."
+      },
+      "setbacks.rear": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for setbacks.rear."
+      },
+      "setbacks.left": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for setbacks.left."
+      },
+      "setbacks.right": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for setbacks.right."
+      },
+      "building.height_estimated": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for building.height_estimated."
+      },
+      "building.height": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for building.height."
+      },
+      "floor.height": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for floor.height."
+      },
+      "plinth.height": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for plinth.height."
+      },
+      "parapet.height": {
+        "value": null,
+        "unit": "m",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for parapet.height."
+      },
+      "plot.area": {
+        "value": null,
+        "unit": "m2",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for plot.area."
+      },
+      "building.plinth_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for building.plinth_area."
+      },
+      "building.footprint_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for building.footprint_area."
+      },
+      "coverage": {
+        "value": null,
+        "unit": "m2",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for coverage."
+      },
+      "far.area": {
+        "value": null,
+        "unit": "m2",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for far.area."
+      },
+      "far": {
+        "value": null,
+        "unit": "m2",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for far."
+      },
+      "building.gross_built_up_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "MISSING",
+        "source": null,
+        "confidence": "MISSING",
+        "reason": "No independent CV or Vision evidence for building.gross_built_up_area."
+      }
+    },
+    "summary": {
+      "AGREED": 0,
+      "CV_ONLY": 1,
+      "VISION_ONLY": 0,
+      "CONFLICT": 0,
+      "MISSING": 20
+    },
+    "has_conflicts": false
+  },
+  "document_verified_fusion": {
+    "document_id": "PLAN5",
+    "cv_values": {
+      "plot.width": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "plot.depth": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "building.width": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "building.depth": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "road.width": {
+        "value": 10.0,
+        "unit": "m",
+        "status": "FOUND"
+      },
+      "setbacks.front": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "setbacks.rear": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "setbacks.left": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "setbacks.right": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "building.height_estimated": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "building.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "floor.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "plinth.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "parapet.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "plot.area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "building.plinth_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "building.footprint_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "coverage": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "far.area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "far": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_CV"
+      },
+      "building.gross_built_up_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_CV"
+      }
+    },
+    "vision_values": {
+      "plot.width": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "plot.depth": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "building.width": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "building.depth": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "road.width": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "setbacks.front": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "setbacks.rear": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "setbacks.left": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "setbacks.right": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "building.height_estimated": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "building.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "floor.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "plinth.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "parapet.height": {
+        "value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "plot.area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "building.plinth_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "building.footprint_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "coverage": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "far.area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "far": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_VISION"
+      },
+      "building.gross_built_up_area": {
+        "value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_VISION"
+      }
+    },
+    "document_evidence": {
+      "plot.width": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "plot.depth": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "building.width": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "building.depth": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "road.width": {
+        "cv_candidate": {
+          "raw_value": "7.14X6.50 BELOW BELOW 10m WIDE ROAD WINDOW 1.20 X 1.20",
+          "native_text_confirmed": true,
+          "ocr_confirmed": false,
+          "geometry_supported": false,
+          "dimension_line_associated": true,
+          "semantic_associated": true,
+          "occurrence_count": 4,
+          "sources": [
+            "document_text_occurrence",
+            "native_pdf_text"
+          ],
+          "score": 15
+        },
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "setbacks.front": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "setbacks.rear": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "setbacks.left": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "setbacks.right": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "building.height_estimated": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "building.height": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "floor.height": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "plinth.height": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "parapet.height": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "plot.area": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "building.plinth_area": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "building.footprint_area": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "coverage": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "far.area": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "far": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      },
+      "building.gross_built_up_area": {
+        "cv_candidate": null,
+        "vision_candidate": null,
+        "text_index_available": true
+      }
+    },
+    "conflicts": {},
+    "validation": {
+      "plot.width": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "plot.depth": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "building.width": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "building.depth": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "road.width": {
+        "status": "CV_ONLY_DOCUMENT_VERIFIED",
+        "reason": "Only CV produced a candidate; the document independently confirms it.",
+        "winner": "cv"
+      },
+      "setbacks.front": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "setbacks.rear": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "setbacks.left": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "setbacks.right": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "building.height_estimated": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "building.height": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "floor.height": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "plinth.height": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "parapet.height": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "plot.area": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "building.plinth_area": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "building.footprint_area": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "coverage": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "far.area": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "far": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      },
+      "building.gross_built_up_area": {
+        "status": "NOT_FOUND_BY_EITHER",
+        "reason": "Neither CV nor Vision produced a candidate for this field.",
+        "winner": null
+      }
+    },
+    "final_agreed_values": {
+      "plot.width": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "plot.depth": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "building.width": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "building.depth": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "road.width": {
+        "final_value": 10.0,
+        "unit": "m",
+        "status": "CV_ONLY_DOCUMENT_VERIFIED"
+      },
+      "setbacks.front": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "setbacks.rear": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "setbacks.left": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "setbacks.right": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "building.height_estimated": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "building.height": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "floor.height": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "plinth.height": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "parapet.height": {
+        "final_value": null,
+        "unit": "m",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "plot.area": {
+        "final_value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "building.plinth_area": {
+        "final_value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "building.footprint_area": {
+        "final_value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "coverage": {
+        "final_value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "far.area": {
+        "final_value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "far": {
+        "final_value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_EITHER"
+      },
+      "building.gross_built_up_area": {
+        "final_value": null,
+        "unit": "m2",
+        "status": "NOT_FOUND_BY_EITHER"
+      }
+    },
+    "reported_vs_calculated": {
+      "road.width": {
+        "reported_value": 10.0,
+        "calculated_value": null,
+        "final_value": 10.0,
+        "status": "REPORTED_VALUE_ONLY"
+      }
+    },
+    "provenance": {
+      "plot.width": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "plot.depth": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "building.width": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "building.depth": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "road.width": {
+        "cv_source": [
+          "NATIVE_TEXT"
+        ],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "setbacks.front": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "setbacks.rear": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "setbacks.left": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "setbacks.right": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "building.height_estimated": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "building.height": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "floor.height": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "plinth.height": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "parapet.height": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "plot.area": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "building.plinth_area": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "building.footprint_area": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "coverage": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "far.area": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "far": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      },
+      "building.gross_built_up_area": {
+        "cv_source": [],
+        "vision_present": false,
+        "document_text_index_available": true
+      }
+    },
+    "summary": {
+      "NOT_FOUND_BY_EITHER": 20,
+      "CV_ONLY_DOCUMENT_VERIFIED": 1
+    },
+    "has_unresolved_conflicts": false
+  }
+}

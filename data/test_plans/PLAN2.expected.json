@@ -1,0 +1,17 @@
+{
+  "plot.width": 12.19,
+  "plot.depth": 18.28,
+  "building.width": 10.59,
+  "building.depth": 16.48,
+  "road.width": 9.2,
+  "setbacks.front": 1.0,
+  "setbacks.rear": 0.8,
+  "setbacks.left": 0.8,
+  "setbacks.right": 0.8,
+  "plot.area": 222.83,
+  "building.footprint_area": 174.52,
+  "coverage": 78.32,
+  "far.area": 386.55,
+  "far": 1.73,
+  "building.gross_built_up_area": 579.9
+}
