@@ -65,9 +65,12 @@ def extract_text_items(page: "fitz.Page", page_number: int) -> list[RawTextItem]
 
     IMPORTANT (found via a real rotated architectural sheet, not caught
     by any synthetic fixture): `page.get_text("dict")` returns
-    coordinates in the page's *unrotated* (raw mediabox) space, while
-    `page.get_drawings()` (used by `extract_vector_geometry` below)
-    returns coordinates already in the *rotated* display space that
+    coordinates in the page's *unrotated* (raw mediabox) space, and so
+    does `page.get_drawings()` (used by `extract_vector_geometry`
+    below) -- an earlier version of this note claimed drawings already
+    came back in display space, which is wrong and left rotated pages
+    broken in the opposite direction. BOTH are transformed through
+    `page.rotation_matrix` into the *rotated* display space that
     matches `page.rect` / `PageMetadata.width_pts/height_pts`. For an
     unrotated page (rotation == 0, by far the common case) these are
     identical and this made no visible difference — but for a rotated
@@ -163,6 +166,35 @@ def extract_vector_geometry(
     rectangles: list[RawRectangle] = []
     polygons: list[RawPolygon] = []
 
+    # Put vector geometry in the SAME space as `extract_text_items` output.
+    #
+    # The note in that function says `get_drawings()` already returns
+    # rotated/display-space coordinates while `get_text("dict")` does not, so
+    # only text needed transforming. That is not what actually happens: on a
+    # /Rotate 270 sheet (PLAN4) the text comes back spanning the landscape
+    # page (x up to 1630 of 1684) while the drawings come back spanning the
+    # portrait mediabox (y up to 1634 of 1684) -- i.e. the two are a quarter
+    # turn apart, and the transform is needed on BOTH sides.
+    #
+    # The failure is silent and total: every text-to-geometry distance on
+    # such a page compares positions from two different coordinate systems,
+    # so dimension-to-line association, plot-label proximity and site-region
+    # search all quietly match nothing. PLAN4 reconstructed zero rectangles
+    # anywhere near its site plan for exactly this reason.
+    #
+    # For an unrotated page `rotation_matrix` is the identity, so this is a
+    # no-op on every non-rotated sheet.
+    rot_matrix = getattr(page, "rotation_matrix", None)
+
+    def _pt(point) -> Point:
+        if rot_matrix is None:
+            return Point(x=point.x, y=point.y)
+        transformed = point * rot_matrix
+        return Point(x=transformed.x, y=transformed.y)
+
+    fitz = _import_fitz()
+    fitz_point = fitz.Point
+
     try:
         drawings = page.get_drawings()
     except Exception as exc:  # pragma: no cover - defensive, malformed content stream
@@ -177,34 +209,40 @@ def extract_vector_geometry(
         for op in items:
             kind = op[0]
             if kind == "l":  # line: (p1, p2)
-                p1, p2 = op[1], op[2]
+                start, end = _pt(op[1]), _pt(op[2])
                 lines.append(
                     RawLine(
-                        line=Line(
-                            start=Point(x=p1.x, y=p1.y), end=Point(x=p2.x, y=p2.y)
-                        ),
+                        line=Line(start=start, end=end),
                         page=page_number,
                         source=SourceKind.VECTOR_PDF,
                         stroke_width=stroke_width,
                     )
                 )
-                poly_points.extend([(p1.x, p1.y), (p2.x, p2.y)])
+                poly_points.extend([(start.x, start.y), (end.x, end.y)])
             elif kind == "re":  # rectangle: (Rect, rotate)
                 rect = op[1]
+                # Transform all four corners: a 90/270 turn keeps the
+                # rectangle axis-aligned but swaps its width and height, so
+                # taking the bbox of the transformed corners is both correct
+                # and rotation-agnostic.
+                corners = [
+                    _pt(fitz_point(rect.x0, rect.y0)), _pt(fitz_point(rect.x1, rect.y0)),
+                    _pt(fitz_point(rect.x1, rect.y1)), _pt(fitz_point(rect.x0, rect.y1)),
+                ]
+                xs = [c.x for c in corners]
+                ys = [c.y for c in corners]
                 rectangles.append(
                     RawRectangle(
                         bounding_box=BoundingBox(
-                            min_x=rect.x0, min_y=rect.y0, max_x=rect.x1, max_y=rect.y1
+                            min_x=min(xs), min_y=min(ys), max_x=max(xs), max_y=max(ys)
                         ),
                         page=page_number,
                         source=SourceKind.VECTOR_PDF,
                     )
                 )
-                poly_points.extend(
-                    [(rect.x0, rect.y0), (rect.x1, rect.y0), (rect.x1, rect.y1), (rect.x0, rect.y1)]
-                )
+                poly_points.extend([(c.x, c.y) for c in corners])
             elif kind in ("c", "qu"):  # curve/quad — approximate with endpoints
-                pts = [p for p in op[1:] if hasattr(p, "x")]
+                pts = [_pt(p) for p in op[1:] if hasattr(p, "x")]
                 poly_points.extend([(p.x, p.y) for p in pts])
 
         if len(poly_points) >= 3:

@@ -164,6 +164,10 @@ def test_multi_view_sheet_keeps_every_distinct_view_scale():
     assert {n.denominator for n in notes} == {25, 50, 75, 100}
     # ...and the mix ratios on the same sheet are still excluded.
     assert 5 not in {n.denominator for n in notes}
+    # None of these four actually governs PLAN4's site plan, which is drawn
+    # to fit rather than to a stated scale -- so detecting them all is
+    # necessary but not sufficient, and the resolver has to fall back to
+    # scale derived from the site plan's own edge labels.
 
 
 # --- PLAN2: the plan that already resolved, and must not regress ------------
@@ -305,18 +309,73 @@ def test_real_sheet_produces_far_fewer_but_better_dimension_candidates():
 # --- Abstention: a wrong measurement is worse than a missing one ------------
 
 
+# PLAN4: rotated page, feet-and-inches dimensions, stacked dimension chains,
+# and no printed scale that applies to the site plan.
+PLAN4 = {
+    "plot.width": 18.288,        # 60'-0"
+    "plot.depth": 16.6116,       # 54'-6"
+    "building.width": 16.459,    # 54'-0"
+    "building.depth": 11.2776,   # 37'-0"
+    # Its road runs down the LEFT of the site plan, so the 3'-0" gaps are
+    # front/rear and the 8'-9" gaps are the sides.
+    "setbacks.front": 0.9144,
+    "setbacks.rear": 0.9144,
+    "setbacks.left": 2.667,
+    "setbacks.right": 2.667,
+    "road.width": 7.62,          # "25 FEET ROAD"
+    "stated_plot_area": 303.79,
+    "stated_footprint_area": 185.62,
+}
+
+
+def test_plan4_resolves_a_rotated_sheet_dimensioned_in_feet_and_inches():
+    """
+    PLAN4 needed four separate things to be right at once:
+
+    - Its page is /Rotate 270, and vector geometry was being left in the
+      unrotated mediabox while text was transformed into display space, so
+      the two were a quarter turn apart and nothing matched anything.
+    - Its dimensions are feet-and-inches with a hyphen (8'-9"), which parsed
+      as a bare 8 feet.
+    - Its site plan is dimensioned as a stacked chain (3'-0" | 54'-0" | 3'-0"
+      under an overall 60'-0"), so the label nearest the plot edge is a
+      setback, not the plot width.
+    - None of the four scales it prints applies to the site plan, so scale
+      has to come from its own edge labels.
+    """
+    got = _measurements("PLAN4.pdf")
+    for field in (
+        "plot.width", "plot.depth", "building.width", "building.depth",
+        "setbacks.front", "setbacks.rear", "setbacks.left", "setbacks.right",
+        "road.width",
+    ):
+        _assert_close(got.get(field), PLAN4[field], field)
+
+
+def test_plan4_geometry_reproduces_both_stated_areas():
+    got = _measurements("PLAN4.pdf")
+    _assert_close(
+        got["plot.width"] * got["plot.depth"], PLAN4["stated_plot_area"], "plot area", 0.01
+    )
+    _assert_close(
+        got["building.width"] * got["building.depth"],
+        PLAN4["stated_footprint_area"], "footprint area", 0.01,
+    )
+
+
+def test_road_width_honours_the_unit_it_is_printed_in():
+    """PLAN4 states "25 FEET ROAD"; read as 25 m that is a highway."""
+    got = _measurements("PLAN4.pdf")
+    _assert_close(got.get("road.width"), 7.62, "road.width")
+
+
 @pytest.mark.parametrize(
     "plan_filename, why",
     [
         (
-            "PLAN4.pdf",
-            "contains no site plan at all -- floor plans, a foundation detail, a staircase "
-            "detail and a percolation-pit detail, with no plot boundary drawn anywhere",
-        ),
-        (
             "PLAN7.pdf",
-            "is a low-quality raster scan whose OCR loses decimal points "
-            "('4 29X3 20' for '4.29X3.20'), with no site plan region",
+            "is a photograph of a blueprint -- no vector geometry at all, no site plan "
+            "region, and OCR that loses decimal points ('4 29X3 20' for '4.29X3.20')",
         ),
     ],
 )

@@ -28,9 +28,34 @@ from backend.schemas.geometry import BoundingBox
 from backend.schemas.independent_measurements import IndependentCVResult, IndependentMeasurement
 
 _SITE_RE = re.compile(r"\bSITE\s+PLAN\b", re.I)
-_ROAD_VALUE_RE = re.compile(r"(?P<value>\d+(?:\.\d+)?)\s*(?:m\s*)?(?:WIDE\s+)?R\s*O\s*A\s*D\b", re.I)
+# "7.30m Wide Road", "10m WIDE ROAD", "9.14M WIDE ROAD", "25 FEET ROAD".
+# The unit word is captured because it is not always metres: PLAN4 states
+# its road as "25 FEET ROAD", which read as 25 m would be a four-lane
+# highway rather than a 7.62 m residential street.
+_ROAD_VALUE_RE = re.compile(
+    r"(?P<value>\d+(?:\.\d+)?)\s*(?P<unit>m|mt|mtr|metres?|meters?|ft|feet|foot)?\s*"
+    r"(?:WIDE\s+)?R\s*O\s*A\s*D\b",
+    re.I,
+)
+_ROAD_UNIT_TO_METRES = {"ft": 0.3048, "feet": 0.3048, "foot": 0.3048}
+
+
+def _road_width_metres(match) -> float | None:
+    """The road width in metres, honouring the unit printed alongside it."""
+    try:
+        value = float(match.group("value"))
+    except (TypeError, ValueError):
+        return None
+    unit = (match.group("unit") or "").strip().lower()
+    return value * _ROAD_UNIT_TO_METRES.get(unit, 1.0)
 _NUM_RE = re.compile(r"(?<![A-Za-z])(?P<value>\d*\.\d+|\d+)(?:\s*(?P<unit>mm|cm|m|ft|feet|in|\"|'))?", re.I)
-_FEET_RE = re.compile(r"(?P<ft>\d+(?:\.\d+)?)\s*'\s*(?P<inch>\d+(?:\.\d+)?)?\s*\"?", re.I)
+# Feet and inches, with or without the hyphen draughtsmen usually put
+# between them: 8'9", 8' 9", 8'-9". The hyphen form was not matched, so
+# PLAN4's 8'-9" setbacks parsed as a bare 8 feet -- 2.44 m instead of
+# 2.67 m, a 9% error that looked entirely plausible.
+# `dimension_candidates._FEET_INCHES_RE` already allowed the hyphen; this
+# copy of the same idea had drifted out of step with it.
+_FEET_RE = re.compile(r"(?P<ft>\d+(?:\.\d+)?)\s*'\s*-?\s*(?P<inch>\d+(?:\.\d+)?)?\s*\"?", re.I)
 # "2.00X1.35", "1.20 X 1.20", "0.90X2.10" -- door/window/room schedule
 # notation ("width X height"), always two numbers joined by a bare X/x with
 # no unit. A plot/building edge dimension is never written this way (it's
@@ -550,6 +575,52 @@ def _pick_edge_dimension(nums, outer: BoundingBox, orientation: str, road_text_b
     return candidates[0][1:] if candidates else None
 
 
+# How many labels per edge to consider before settling on one.
+_EDGE_LABEL_CANDIDATES = 4
+
+
+def _edge_dimension_candidates(
+    nums, outer: BoundingBox, orientation: str, road_text_boxes: list | None = None
+) -> list[tuple[float, object]]:
+    """
+    The plausible dimension labels for one edge, nearest first.
+
+    `_pick_edge_dimension` returns only the nearest, which is wrong whenever
+    a drawing stacks dimension lines -- the near-universal convention of
+    printing an overall dimension outside a chain of partial ones. PLAN4's
+    site plan is dimensioned 3'-0" | 54'-0" | 3'-0" with 60'-0" above it, so
+    the nearest label to the plot's top edge is a 0.91 m setback, and reading
+    it as the plot width made the whole sheet unresolvable. Which of the
+    stacked labels is the edge's own dimension cannot be settled locally --
+    it is decided by which choice makes the rest of the drawing consistent --
+    so the choice is deferred to the caller.
+    """
+    scored: list[tuple[float, float, object]] = []
+    road_text_boxes = road_text_boxes or []
+    for value, item, _unit in nums:
+        text = (item.text or "").strip()
+        if re.search(r"r\s*o\s*a\s*d", text, re.I):
+            continue
+        if any(item.bounding_box.intersects(rb) for rb in road_text_boxes):
+            continue
+        c = item.bounding_box.center
+        if orientation == "horizontal":
+            outside = c.y < outer.min_y - 1.0 or c.y > outer.max_y + 1.0
+            overlap = outer.min_x - 30 <= c.x <= outer.max_x + 30
+            distance = min(abs(c.y - outer.min_y), abs(c.y - outer.max_y))
+        else:
+            outside = c.x < outer.min_x - 1.0 or c.x > outer.max_x + 1.0
+            overlap = outer.min_y - 30 <= c.y <= outer.max_y + 30
+            distance = min(abs(c.x - outer.min_x), abs(c.x - outer.max_x))
+        if not (outside and overlap and distance <= 90):
+            continue
+        if value < 2.0:
+            continue
+        scored.append((distance, value, item))
+    scored.sort(key=lambda t: t[0])
+    return [(value, item) for _d, value, item in scored[:_EDGE_LABEL_CANDIDATES]]
+
+
 def _pick_gap_dimension(
     nums, outer: BoundingBox, inner: BoundingBox, side: str, max_setback_m: float | None = None
 ):
@@ -619,10 +690,13 @@ _AREA_TARGET_LABELS = [
     # label into a longer run of neighbouring text
     # ("3 5e8340 on 00X00 SITE AREA : 160.77 Sq.m" on PLAN5), so anchoring
     # meant it never matched on exactly the scanned plans that need it most.
-    ("plot_area_gross", re.compile(r"SITE\s+AREA\s*[:\-]", re.I)),
+    ("plot_area_gross", re.compile(r"SITE\s+AREA\b", re.I)),
     ("plot_area_net", re.compile(r"^NET\s+AREA\s+OF\s+PLOT", re.I)),
     ("building_footprint_area", re.compile(r"^PROPOSED\s+COVERAGE\s+AREA", re.I)),
     ("building_footprint_area", re.compile(r"GROUND\s+COVERAGE\s+AREA", re.I)),
+    # "G.F AREA" -- ground-floor area, i.e. the footprint, in a sheet that
+    # tabulates area per floor rather than naming a coverage area.
+    ("building_footprint_area", re.compile(r"\bG\.?\s*F\.?\s+AREA\b", re.I)),
 ]
 
 # "SITE AREA : 160.77 Sq.m" -- label and value in a single text run, rather
@@ -633,16 +707,33 @@ _MIN_PLAUSIBLE_AREA_M2 = 10.0
 _INLINE_AREA_VALUE_RE = re.compile(
     r"(?P<value>\d+(?:\.\d+)?)\s*(?:sq\.?\s*m|sqm|m2|m²|smt)\b", re.I
 )
-# Same idea without a unit token: "GROUND COVERAGE AREA 93.46". Only used
-# when the run already matched a specific area label, and only for a number
-# at the very end, so it cannot pick up a mid-sentence figure.
-_TRAILING_AREA_VALUE_RE = re.compile(r"(?P<value>\d+(?:\.\d+)?)\s*$")
+# A number that is NOT a percentage. The negative lookahead is essential:
+# BBMP sheets write the coverage label as "Proposed Coverage Area (79.15 %)"
+# with the actual area in the next table cell, so an unguarded "first number
+# after the label" reads the percentage as if it were an area in sq m.
+# The digit boundaries on both sides are not decoration. Without the
+# trailing `(?![\d.])` the engine backtracks around the percent guard and
+# matches a PREFIX of the number instead: "(79.15 %)" yielded 79.1, which is
+# both wrong and plausible-looking.
+_ANY_NUMBER_RE = re.compile(r"(?<![\d.])(?P<value>\d+(?:\.\d+)?)(?![\d.])(?!\s*%)")
 
 
-def _inline_area_value(text: str) -> float | None:
-    """The area figure stated inside a label run itself, if there is one."""
-    for pattern in (_INLINE_AREA_VALUE_RE, _TRAILING_AREA_VALUE_RE):
-        match = pattern.search(text)
+def _inline_area_value(text: str, search_from: int = 0) -> float | None:
+    """
+    The area figure stated inside a label run itself, if there is one.
+
+    Searches only AFTER the label, and takes the FIRST number found rather
+    than the last. Both matter: an area table is commonly emitted as one text
+    run per row carrying every column at once
+    ("SITE AREA    303.79    3270"), and its first numeric column is the
+    metric one -- taking the last would have read PLAN4's site area as
+    3270 sq m instead of 303.79, since the trailing column is square feet.
+    A value that is immediately followed by an area unit still wins outright,
+    which covers "SITE AREA : 160.77 Sq.m".
+    """
+    tail = text[search_from:]
+    for pattern in (_INLINE_AREA_VALUE_RE, _ANY_NUMBER_RE):
+        match = pattern.search(tail)
         if match:
             try:
                 return float(match.group("value"))
@@ -668,10 +759,11 @@ def _area_targets(text_items: list[RawTextItem]) -> dict[str, float]:
         if key in targets:
             continue
         for label_item in ordered:
-            if not pattern.search((label_item.text or "").strip()):
-                continue
             label_text = (label_item.text or "").strip()
-            value = _inline_area_value(label_text)
+            label_match = pattern.search(label_text)
+            if not label_match:
+                continue
+            value = _inline_area_value(label_text, label_match.end())
             if value is None:
                 numeric_item = _nearest_numeric_item(label_item, ordered)
                 if numeric_item is None:
@@ -1027,8 +1119,45 @@ def extract_site_plan_measurements(
       for candidate in substantial:
         if not _plausible_plot_rect(candidate, scale_pts_per_m):
             continue
-        wd = _pick_edge_dimension(nums, candidate.bbox, "horizontal", road_text_boxes)
-        dd = _pick_edge_dimension(nums, candidate.bbox, "vertical", road_text_boxes)
+        # Each edge may offer several stacked labels; the right one is the
+        # one that makes this rectangle agree with the sheet's stated areas.
+        # A candidate's own edge label also supplies the scale when the sheet
+        # prints none: pt/m = the rectangle's width in points over the width
+        # that label claims. That is not circular for the area test, because
+        # the scale comes from ONE axis and the area then tests the OTHER.
+        width_options = _edge_dimension_candidates(
+            nums, candidate.bbox, "horizontal", road_text_boxes
+        ) or [None]
+        depth_options = _edge_dimension_candidates(
+            nums, candidate.bbox, "vertical", road_text_boxes
+        ) or [None]
+
+        best_variant = None
+        for wd in width_options:
+            for dd in depth_options:
+                if scale_pts_per_m is not None:
+                    trial_scale = scale_pts_per_m
+                elif wd and wd[0] > 0:
+                    trial_scale = candidate.width / wd[0]
+                elif dd and dd[0] > 0:
+                    trial_scale = candidate.height / dd[0]
+                else:
+                    trial_scale = None
+                agreement = 0.0
+                if trial_scale is not None and plot_area_target is not None:
+                    err = _area_agreement(candidate, plot_area_target, trial_scale)
+                    if err is not None and err <= _AREA_MATCH_TOLERANCE:
+                        agreement += 10.0 * (1.0 - err / _AREA_MATCH_TOLERANCE)
+                # When both axes carry a label, they must imply the same
+                # scale; a partial dimension read as a full edge will not.
+                if wd and dd and wd[0] > 0 and dd[0] > 0:
+                    sw, sd = candidate.width / wd[0], candidate.height / dd[0]
+                    if max(sw, sd) > 0:
+                        agreement += 4.0 * max(0.0, 1.0 - abs(sw - sd) / max(sw, sd) / 0.05)
+                if best_variant is None or agreement > best_variant[0]:
+                    best_variant = (agreement, wd, dd, trial_scale)
+
+        _agreement, wd, dd, effective_scale = best_variant
         nested_for_candidate = []
         for r in substantial:
             if r is candidate or not _inside(r.bbox, candidate.bbox, tol=3.0):
@@ -1078,10 +1207,36 @@ def extract_site_plan_measurements(
         # neither of which was used to produce the other. It is weighted
         # above the edge-label bonuses precisely because it still works on
         # a drawing with no edge labels.
-        if scale_pts_per_m is not None and plot_area_target is not None:
-            error = _area_agreement(candidate, plot_area_target, scale_pts_per_m)
+        if effective_scale is not None and plot_area_target is not None:
+            error = _area_agreement(candidate, plot_area_target, effective_scale)
             if error is not None and error <= _AREA_MATCH_TOLERANCE:
                 score += 10.0 * (1.0 - error / _AREA_MATCH_TOLERANCE)
+
+        # Does this candidate contain a rectangle that reproduces the stated
+        # COVERAGE area at this candidate's own scale?
+        #
+        # This is the test that separates a plot boundary from a dimension
+        # frame drawn around it. Those two are often geometrically similar --
+        # on PLAN4 the frame and the true boundary differ in aspect ratio by
+        # 0.24% -- so a plot-area check derived from one axis cannot tell
+        # them apart, because it reduces to an aspect-ratio comparison. The
+        # building inside them is not similar: read against the frame it
+        # measures 153.6 sq.m, against the true boundary 185.6 sq.m, and the
+        # sheet says 185.62.
+        if effective_scale is not None and nested_for_candidate:
+            stated = area_targets.get("building_footprint_area")
+            footprint = (
+                _best_rect_for_area(nested_for_candidate, stated, effective_scale)
+                if stated is not None else None
+            )
+            if footprint is not None:
+                # Graded, not pass/fail. A dimension frame drawn around the
+                # plot is close enough in shape that it also contains SOME
+                # rectangle within tolerance of the stated coverage area --
+                # on PLAN4 the frame's best is 1.31% out while the true
+                # boundary's is 0.01%. Both clear a binary threshold; only
+                # the margin between them says which is the real boundary.
+                score += 8.0 * (1.0 - footprint[1] / _AREA_MATCH_TOLERANCE)
 
         if nested_for_candidate:
             score += 3.0
@@ -1109,7 +1264,8 @@ def extract_site_plan_measurements(
         score += min(1.0, candidate.area / max(r.area for r in substantial))
         scored_rects.append(
             (score, candidate, wd if width_label_ok else None,
-             dd if depth_label_ok else None, nested_for_candidate, printed_scale)
+             dd if depth_label_ok else None, nested_for_candidate, printed_scale,
+             effective_scale)
         )
 
     if not scored_rects:
@@ -1122,7 +1278,7 @@ def extract_site_plan_measurements(
         return [], region, None, None, notes
 
     scored_rects.sort(key=lambda x: (x[0], x[1].area), reverse=True)
-    _score, outer, width_dim, depth_dim, nested, printed_scale = scored_rects[0]
+    _score, outer, width_dim, depth_dim, nested, printed_scale, winner_scale = scored_rects[0]
 
     # Whether ANYTHING independent of the geometry itself confirms that this
     # rectangle is the plot boundary at this scale.
@@ -1136,9 +1292,8 @@ def extract_site_plan_measurements(
     # number presented as a measurement is worse than a missing one here,
     # because the compliance engine downstream treats MISSING as
     # INSUFFICIENT_DATA (correct) but treats a value as fact.
-    area_confirmed = (
-        scale_for_winner := (printed_scale.points_per_metre if printed_scale else None)
-    ) is not None and plot_area_target is not None and (
+    scale_for_winner = winner_scale
+    area_confirmed = scale_for_winner is not None and plot_area_target is not None and (
         (err := _area_agreement(outer, plot_area_target, scale_for_winner)) is not None
         and err <= _AREA_MATCH_TOLERANCE
     )
@@ -1319,7 +1474,10 @@ def extract_site_plan_measurements(
             continue
         m = _ROAD_VALUE_RE.search(item.text or "")
         if m:
-            road = (float(m.group("value")), item)
+            width_m = _road_width_metres(m)
+            if width_m is None:
+                continue
+            road = (width_m, item)
             break
     if road is not None:
         measurements.append(_measurement("road.width", road[0], "NATIVE_TEXT", 0.99, [road[1].text.strip()], "Explicit road-width label; not inferred from the road rectangle.", page_number, outer.bbox))

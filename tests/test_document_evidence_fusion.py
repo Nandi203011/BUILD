@@ -218,8 +218,16 @@ def test_plan2_full_document_verified_fusion_matches_acceptance_values():
     # (174.52 sq.m) to within 0.027%, against 0.064% for the label-derived
     # scale. The plot dimensions are unchanged because they still come from
     # explicit printed labels, not from geometry.
+    # plot.depth moved 18.28 -> 18.288 when edge-label selection began
+    # considering every label on an edge rather than only the nearest. PLAN2
+    # prints its plot dimensions twice, metric and imperial
+    # ("12.19(40'0\")" and "18.28" alongside "(60'0\")"), and the imperial
+    # form is the exact one: 60'0" is 18.288 m, of which "18.28" is a
+    # truncation. plot.width was already reading 40'0" -> 12.192 for the same
+    # reason, so this makes the two axes consistent rather than mixing a
+    # rounded value with an exact one.
     expected = {
-        "plot.width": 12.192, "plot.depth": 18.28,
+        "plot.width": 12.192, "plot.depth": 18.288,
         "building.width": 10.5904, "building.depth": 16.4747,
         "setbacks.front": 1.0, "setbacks.rear": 0.8, "setbacks.left": 0.8, "setbacks.right": 0.8,
         "road.width": 9.2, "plot.area": 222.83, "building.footprint_area": 174.52,
