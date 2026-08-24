@@ -22,7 +22,7 @@ import re
 from dataclasses import dataclass
 from typing import Iterable
 
-from backend.cv_extraction.raw_types import RawLine, RawTextItem
+from backend.cv_extraction.raw_types import RawLine, RawRectangle, RawTextItem
 from backend.cv_extraction.scale_note import ScaleNote, detect_scale_notes, nearest_scale_note
 from backend.schemas.geometry import BoundingBox
 from backend.schemas.independent_measurements import IndependentCVResult, IndependentMeasurement
@@ -40,6 +40,12 @@ _FEET_RE = re.compile(r"(?P<ft>\d+(?:\.\d+)?)\s*'\s*(?P<inch>\d+(?:\.\d+)?)?\s*\
 # plot.width=2.0 because nothing filtered this pattern out before the first
 # number inside it got treated as a normal edge-dimension candidate.
 _SCHEDULE_SIZE_RE = re.compile(r"\d+(?:\.\d+)?\s*[xX]\s*\d+(?:\.\d+)?")
+# Just the word, for locating the road relative to the plot. Deliberately
+# separate from `_ROAD_VALUE_RE` (which needs the width figure too): the
+# direction question only needs to know where the road is, and on an
+# OCR'd sheet the full "<n>m WIDE ROAD" phrase survives only inside a merged
+# line group whose bounding box is useless for position.
+_ROAD_WORD_RE = re.compile(r"\broads?\b", re.I)
 
 
 @dataclass(frozen=True)
@@ -280,20 +286,105 @@ def _rectangles_from_lines(lines: list[RawLine], region: BoundingBox) -> list[_R
                     rects.append(
                         _Rect(BoundingBox(min_x=x0, min_y=y0, max_x=x1, max_y=y1))
                     )
-    # Deduplicate nearly identical rectangles.
+    return _dedupe_rectangles(rects)
+
+
+def _dedupe_rectangles(rects: list[_Rect]) -> list[_Rect]:
+    """Collapse rectangles that describe the same edges within line-weight."""
+    def nearly_same(a: BoundingBox, b: BoundingBox) -> bool:
+        return (
+            abs(a.min_x - b.min_x) <= 3.0 and
+            abs(a.min_y - b.min_y) <= 3.0 and
+            abs(a.max_x - b.max_x) <= 3.0 and
+            abs(a.max_y - b.max_y) <= 3.0
+        )
+
     unique: list[_Rect] = []
     for r in sorted(rects, key=lambda x: x.area, reverse=True):
-        def nearly_same(a: BoundingBox, b: BoundingBox) -> bool:
-            return (
-                abs(a.min_x - b.min_x) <= 3.0 and
-                abs(a.min_y - b.min_y) <= 3.0 and
-                abs(a.max_x - b.max_x) <= 3.0 and
-                abs(a.max_y - b.max_y) <= 3.0
-            )
         if any(nearly_same(r.bbox, u.bbox) for u in unique):
             continue
         unique.append(r)
     return unique
+
+
+# Plot sides in clockwise order in page space (Y grows downward).
+_SIDES_CLOCKWISE = ("top", "right", "bottom", "left")
+
+
+def _front_side_from_road(outer: BoundingBox, road_boxes: list[BoundingBox]) -> str:
+    """
+    Which geometric side of the plot faces the road.
+
+    The front setback is the one measured toward the road, so every other
+    side's identity follows from this. It used to be assumed that the road is
+    always at the bottom of the page, which holds only for an upright sheet.
+    PLAN5's sheet is drawn rotated 90 degrees, putting its "10m WIDE ROAD" on
+    the LEFT -- so all four setbacks were measured correctly and then labelled
+    a quarter-turn out: the real 3.00 m front setback was reported as the left
+    setback, and the real 1.00 m left setback was reported as the front.
+    Values that are individually right but attached to the wrong side are
+    especially dangerous downstream, because each one is then checked against
+    the wrong regulation.
+    """
+    if not road_boxes:
+        return "bottom"
+    centre = outer.center
+    nearest = min(road_boxes, key=lambda b: _bbox_gap(outer, b))
+    dx = nearest.center.x - centre.x
+    dy = nearest.center.y - centre.y
+    if abs(dx) > abs(dy):
+        return "left" if dx < 0 else "right"
+    return "top" if dy < 0 else "bottom"
+
+
+def _setback_labels_for_front(front_side: str) -> dict[str, str]:
+    """
+    Map each geometric side to its setback name, given which side is the front.
+
+    Left and right are taken from the viewpoint of someone standing on the
+    road looking into the plot, which is the convention building byelaws use.
+    With the front at the bottom of an upright sheet this reduces to the
+    obvious mapping (bottom=front, top=rear, left=left, right=right).
+    """
+    if front_side not in _SIDES_CLOCKWISE:
+        front_side = "bottom"
+    i = _SIDES_CLOCKWISE.index(front_side)
+    return {
+        front_side: "setbacks.front",
+        _SIDES_CLOCKWISE[(i + 2) % 4]: "setbacks.rear",
+        _SIDES_CLOCKWISE[(i + 1) % 4]: "setbacks.left",
+        _SIDES_CLOCKWISE[(i + 3) % 4]: "setbacks.right",
+    }
+
+
+def _candidate_rectangles(
+    lines: list[RawLine], region: BoundingBox, rectangles: list[RawRectangle] | None = None
+) -> list[_Rect]:
+    """
+    Every axis-aligned rectangle in `region`, from BOTH sources a PDF can
+    express one with.
+
+    A CAD export draws some rectangles as four separate stroked line
+    segments and others as a single `re` operator in the content stream.
+    Only the first kind was ever considered here, because the caller
+    discarded PyMuPDF's rectangle output. On PLAN5 the building footprint is
+    an `re` rectangle measuring 13.09 x 7.14 m -- exactly its printed
+    dimensions, and 93.42 sq.m against the sheet's stated 93.46 -- so the
+    single most reliable piece of geometry on the drawing was thrown away
+    before matching began, and the footprint had to be guessed from
+    line-reconstructed rectangles that did not include it.
+    """
+    found = _rectangles_from_lines(lines, region)
+    for raw in rectangles or []:
+        box = raw.bounding_box
+        if not region.intersects(box):
+            continue
+        if box.width < _MIN_RECT_SIDE_PTS or box.height < _MIN_RECT_SIDE_PTS:
+            continue
+        if max(box.width / box.height, box.height / box.width) > _MAX_RECT_ASPECT:
+            continue
+        found.append(_Rect(box))
+    return _dedupe_rectangles(found)
 
 
 def _find_site_anchor(text_items: list[RawTextItem]) -> RawTextItem | None:
@@ -531,7 +622,7 @@ _AREA_TARGET_LABELS = [
     ("plot_area_gross", re.compile(r"SITE\s+AREA\s*[:\-]", re.I)),
     ("plot_area_net", re.compile(r"^NET\s+AREA\s+OF\s+PLOT", re.I)),
     ("building_footprint_area", re.compile(r"^PROPOSED\s+COVERAGE\s+AREA", re.I)),
-    ("building_footprint_area", re.compile(r"^GROUND\s+COVERAGE\s+AREA", re.I)),
+    ("building_footprint_area", re.compile(r"GROUND\s+COVERAGE\s+AREA", re.I)),
 ]
 
 # "SITE AREA : 160.77 Sq.m" -- label and value in a single text run, rather
@@ -542,6 +633,22 @@ _MIN_PLAUSIBLE_AREA_M2 = 10.0
 _INLINE_AREA_VALUE_RE = re.compile(
     r"(?P<value>\d+(?:\.\d+)?)\s*(?:sq\.?\s*m|sqm|m2|m²|smt)\b", re.I
 )
+# Same idea without a unit token: "GROUND COVERAGE AREA 93.46". Only used
+# when the run already matched a specific area label, and only for a number
+# at the very end, so it cannot pick up a mid-sentence figure.
+_TRAILING_AREA_VALUE_RE = re.compile(r"(?P<value>\d+(?:\.\d+)?)\s*$")
+
+
+def _inline_area_value(text: str) -> float | None:
+    """The area figure stated inside a label run itself, if there is one."""
+    for pattern in (_INLINE_AREA_VALUE_RE, _TRAILING_AREA_VALUE_RE):
+        match = pattern.search(text)
+        if match:
+            try:
+                return float(match.group("value"))
+            except ValueError:
+                continue
+    return None
 
 
 def _area_targets(text_items: list[RawTextItem]) -> dict[str, float]:
@@ -564,13 +671,7 @@ def _area_targets(text_items: list[RawTextItem]) -> dict[str, float]:
             if not pattern.search((label_item.text or "").strip()):
                 continue
             label_text = (label_item.text or "").strip()
-            value = None
-            inline = _INLINE_AREA_VALUE_RE.search(label_text)
-            if inline:
-                try:
-                    value = float(inline.group("value"))
-                except ValueError:
-                    value = None
+            value = _inline_area_value(label_text)
             if value is None:
                 numeric_item = _nearest_numeric_item(label_item, ordered)
                 if numeric_item is None:
@@ -865,6 +966,7 @@ def extract_site_plan_measurements(
     page_width: float,
     page_height: float,
     scale_notes: list[ScaleNote] | None = None,
+    rectangles: list[RawRectangle] | None = None,
 ) -> tuple[list[IndependentMeasurement], BoundingBox | None, float | None, float | None, list[str]]:
     notes: list[str] = []
     anchor = _find_site_anchor(text_items)
@@ -872,7 +974,7 @@ def extract_site_plan_measurements(
         notes.append("no 'SITE PLAN' anchor text found; cannot locate the site-plan sub-region at all.")
         return [], None, None, None, notes
     region = _site_region(anchor, page_width, page_height)
-    rects = _rectangles_from_lines(lines, region)
+    rects = _candidate_rectangles(lines, region, rectangles)
     substantial = [r for r in rects if min(r.width, r.height) >= 70]
     if not substantial:
         notes.append(
@@ -1160,7 +1262,23 @@ def extract_site_plan_measurements(
             if plot_short_side_m != float("inf") else None
         )
 
-        for side, label in (("top", "setbacks.rear"), ("bottom", "setbacks.front"), ("left", "setbacks.left"), ("right", "setbacks.right")):
+        # Prefer precise, single-item road labels for the direction decision.
+        # A merged OCR line group can span half the sheet ("7.14X6.50 BELOW
+        # BELOW 10m WIDE ROAD WINDOW 1.20 X 1.20" on PLAN5), and its centre
+        # then points nowhere near the actual road.
+        road_direction_boxes = [
+            item.bounding_box for item in text_items
+            if region.intersects(item.bounding_box)
+            and not getattr(item, "is_line_group", False)
+            and _ROAD_WORD_RE.search(item.text or "")
+        ] or road_text_boxes
+        front_side = _front_side_from_road(outer.bbox, road_direction_boxes)
+        side_labels = _setback_labels_for_front(front_side)
+        notes.append(
+            f"front setback taken on the {front_side} side of the plot "
+            f"({'road label position' if road_text_boxes else 'no road label found; assumed bottom'})."
+        )
+        for side, label in side_labels.items():
             picked = _pick_gap_dimension(nums, outer.bbox, inner.bbox, side, max_setback_m)
             if picked:
                 val, item = picked
@@ -1225,18 +1343,24 @@ def extract_independent_cv(document_path, document_id: str) -> IndependentCVResu
             page = doc.load_page(page_number)
             meta = pdf_native.extract_page_metadata(page, page_number)
             text_items = pdf_native.extract_text_items(page, page_number)
-            lines, _rects, _polys = pdf_native.extract_vector_geometry(page, page_number)
+            lines, native_rects, _polys = pdf_native.extract_vector_geometry(page, page_number)
             image = None
             if not pdf_native.has_sufficient_native_text(text_items):
                 try:
                     image = ocr_fallback.rasterize_page(page, dpi=200.0)
-                    text_items = ocr_fallback.ocr_page(image, page_number, dpi=200.0)
+                    # Orientation-aware: a landscape sheet stored as an
+                    # unrotated portrait page renders all its text sideways,
+                    # which plain OCR reads badly without ever failing.
+                    text_items = ocr_fallback.ocr_page_any_orientation(
+                        image, page_number, dpi=200.0
+                    )
                 except Exception as exc:
                     warnings.append(f"page {page_number+1}: OCR fallback failed: {exc}")
             page_scale_notes = detect_scale_notes(text_items, page_number)
             measurements, bbox, page_scale, page_scale_conf, notes = extract_site_plan_measurements(
                 text_items, lines, page_number=page_number, page_width=meta.width_pts,
                 page_height=meta.height_pts, scale_notes=page_scale_notes,
+                rectangles=native_rects,
             )
             for n in notes:
                 warnings.append(f"page {page_number+1}: {n}")

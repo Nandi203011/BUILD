@@ -371,22 +371,89 @@ def test_plan5_resolves_a_dashed_plot_boundary_on_a_rotated_rasterised_sheet():
     _assert_close(measured, PLAN5["stated_plot_area"], "plot area", 0.02)
 
 
-def test_plan5_does_not_guess_a_building_it_cannot_confirm():
+def test_plan5_resolves_building_and_setbacks_from_a_scanned_rotated_sheet():
     """
-    PLAN5's coverage area is not recoverable by OCR from its rotated table,
-    so nothing identifies which nested rectangle is the building. Picking the
-    largest reported a building as wide as the whole plot (17.59 m against a
-    real 13.09 m) and made all four setbacks wrong with it. Confirming the
-    plot does not confirm the building -- separate rectangles need separate
-    evidence.
+    The building footprint on PLAN5 is a native PDF `re` rectangle measuring
+    13.09 x 7.14 m -- its exact printed dimensions. The resolver read only
+    stroked line segments and discarded PyMuPDF's rectangle output entirely,
+    so the single most reliable object on the drawing never reached matching.
+
+    Its setbacks additionally needed the front side to be worked out from
+    where the road is, rather than assumed to be the bottom of the page: this
+    sheet is drawn rotated, its road is on the left, and all four setback
+    values were previously correct but labelled a quarter-turn out.
     """
     got = _measurements("PLAN5.pdf")
-    assert got.get("plot.width") is not None, "the plot itself should still resolve"
-    for field in (
-        "building.width", "building.depth",
-        "setbacks.front", "setbacks.rear", "setbacks.left", "setbacks.right",
-    ):
-        assert got.get(field) is None, f"{field} should not be guessed, got {got[field]}"
+    _assert_close(got.get("building.width"), 13.09, "building.width")
+    _assert_close(got.get("building.depth"), 7.14, "building.depth")
+    _assert_close(got.get("setbacks.front"), 3.00, "setbacks.front")
+    _assert_close(got.get("setbacks.rear"), 1.50, "setbacks.rear")
+    # The side setbacks absorb the ~7cm of slack in the dashed boundary's
+    # measured depth, so they carry a looser tolerance than the others.
+    _assert_close(got.get("setbacks.left"), 1.00, "setbacks.left", 0.10)
+    _assert_close(got.get("setbacks.right"), 1.00, "setbacks.right", 0.10)
+
+
+def test_setback_sides_follow_the_road_not_the_page():
+    """
+    Which side is "front" is defined by the road, and left/right are read
+    from someone standing on the road looking in. On an upright sheet this
+    is the obvious mapping; on a sheet drawn rotated it is not.
+    """
+    from backend.cv_extraction.site_plan import (
+        _front_side_from_road,
+        _setback_labels_for_front,
+    )
+    from backend.schemas.geometry import BoundingBox
+
+    plot = BoundingBox(min_x=100, min_y=100, max_x=300, max_y=200)
+    below = BoundingBox(min_x=150, min_y=230, max_x=250, max_y=250)
+    left_of = BoundingBox(min_x=40, min_y=130, max_x=60, max_y=170)
+    assert _front_side_from_road(plot, [below]) == "bottom"
+    assert _front_side_from_road(plot, [left_of]) == "left"
+    # With no road label at all, fall back to the common upright layout.
+    assert _front_side_from_road(plot, []) == "bottom"
+
+    upright = _setback_labels_for_front("bottom")
+    assert upright == {
+        "bottom": "setbacks.front", "top": "setbacks.rear",
+        "left": "setbacks.left", "right": "setbacks.right",
+    }
+    rotated = _setback_labels_for_front("left")
+    assert rotated == {
+        "left": "setbacks.front", "right": "setbacks.rear",
+        "top": "setbacks.left", "bottom": "setbacks.right",
+    }
+    # Every side gets exactly one label, whichever way the sheet is turned.
+    for front in ("top", "right", "bottom", "left"):
+        assert sorted(_setback_labels_for_front(front).values()) == [
+            "setbacks.front", "setbacks.left", "setbacks.rear", "setbacks.right",
+        ]
+
+
+def test_native_rectangle_operators_are_candidate_geometry():
+    """A CAD export draws some rectangles as `re`, not as four line strokes."""
+    from backend.cv_extraction.raw_types import RawRectangle, SourceKind
+    from backend.cv_extraction.site_plan import _candidate_rectangles
+    from backend.schemas.geometry import BoundingBox
+
+    region = BoundingBox(min_x=0, min_y=0, max_x=500, max_y=500)
+    native = RawRectangle(
+        bounding_box=BoundingBox(min_x=100, min_y=100, max_x=300, max_y=250),
+        page=0,
+        source=SourceKind.VECTOR_PDF,
+    )
+    found = _candidate_rectangles([], region, [native])
+    assert len(found) == 1
+    assert found[0].bbox.width == 200 and found[0].bbox.height == 150
+
+    # Slivers and extreme aspect ratios are still rejected.
+    sliver = RawRectangle(
+        bounding_box=BoundingBox(min_x=0, min_y=0, max_x=400, max_y=5),
+        page=0,
+        source=SourceKind.VECTOR_PDF,
+    )
+    assert _candidate_rectangles([], region, [sliver]) == []
 
 
 def test_dashed_sides_are_accepted_by_span_not_by_inked_fraction():
