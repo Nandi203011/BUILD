@@ -339,13 +339,78 @@ def test_sheets_without_a_site_plan_resolve_nothing_rather_than_guessing(plan_fi
         )
 
 
-def test_scanned_plan_still_reports_what_it_can_read_directly():
+# PLAN5: rotated sheet, rasterised text, DASHED plot boundary.
+PLAN5 = {
+    "plot.width": 17.59,
+    "plot.depth": 9.14,
+    "road.width": 10.0,
+    "stated_plot_area": 160.77,   # "SITE AREA : 160.77 Sq.m"
+}
+
+
+def test_plan5_resolves_a_dashed_plot_boundary_on_a_rotated_rasterised_sheet():
     """
-    Abstaining on geometry must not suppress values that come from an
-    explicit printed label rather than from the unverified rectangle.
-    PLAN5 is a scan with no usable vector geometry and no area statement,
-    but its road width is printed in words.
+    PLAN5 is the hard case and it failed for three independent reasons at
+    once, each of which alone was fatal:
+
+    1. Its plot boundary is a DASH-DOT property line -- 71 separate segments
+       on the top edge, longest 8.9pt -- and line clustering required each
+       segment to be at least 35pt, so every one was discarded.
+    2. Its text is rasterised and the whole sheet is rotated 90 degrees (437
+       of 522 OCR items are vertical), so the "SITE PLAN" caption is taller
+       than it is wide and the search window, which assumed an upright
+       caption with its drawing above, landed on the area-statement table.
+    3. Its area statement says "SITE AREA : 160.77 Sq.m", which matched none
+       of the BBMP-worded patterns, leaving nothing to cross-check against.
     """
     got = _measurements("PLAN5.pdf")
-    assert got.get("plot.width") is None
-    _assert_close(got.get("road.width"), 10.0, "road.width", 0.05)
+    _assert_close(got.get("plot.width"), PLAN5["plot.width"], "plot.width")
+    _assert_close(got.get("plot.depth"), PLAN5["plot.depth"], "plot.depth")
+    _assert_close(got.get("road.width"), PLAN5["road.width"], "road.width", 0.05)
+    measured = got["plot.width"] * got["plot.depth"]
+    _assert_close(measured, PLAN5["stated_plot_area"], "plot area", 0.02)
+
+
+def test_plan5_does_not_guess_a_building_it_cannot_confirm():
+    """
+    PLAN5's coverage area is not recoverable by OCR from its rotated table,
+    so nothing identifies which nested rectangle is the building. Picking the
+    largest reported a building as wide as the whole plot (17.59 m against a
+    real 13.09 m) and made all four setbacks wrong with it. Confirming the
+    plot does not confirm the building -- separate rectangles need separate
+    evidence.
+    """
+    got = _measurements("PLAN5.pdf")
+    assert got.get("plot.width") is not None, "the plot itself should still resolve"
+    for field in (
+        "building.width", "building.depth",
+        "setbacks.front", "setbacks.rear", "setbacks.left", "setbacks.right",
+    ):
+        assert got.get(field) is None, f"{field} should not be guessed, got {got[field]}"
+
+
+def test_dashed_sides_are_accepted_by_span_not_by_inked_fraction():
+    """
+    A solid edge inks ~100% of its length; PLAN5's dash-dot plot boundary
+    inks 41%. No single coverage threshold separates the dashed edge from
+    collinear noise, so a dashed side is recognised by its marks spanning the
+    whole side instead.
+    """
+    from backend.cv_extraction.site_plan import _side_is_drawn
+
+    solid = [(0.0, 98.0)]
+    assert _side_is_drawn(0.0, 100.0, solid)
+
+    # ~40% inked, but the marks run corner to corner, as a real dash-dot
+    # boundary does.
+    dashed = [(float(i), i + 4.0) for i in range(0, 101, 10)]
+    assert _side_is_drawn(0.0, 100.0, dashed)
+
+    # Dashes that stop well short of the far corner are not a full side,
+    # even though the pattern looks the same.
+    assert not _side_is_drawn(0.0, 100.0, [(float(i), i + 4.0) for i in range(0, 70, 10)])
+
+    # Two ticks at the corners span the side but are not a drawn edge.
+    assert not _side_is_drawn(0.0, 100.0, [(0.0, 3.0), (97.0, 100.0)])
+    # A line that stops half way is not a side, however solid.
+    assert not _side_is_drawn(0.0, 100.0, [(0.0, 48.0)])

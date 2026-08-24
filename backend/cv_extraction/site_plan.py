@@ -72,7 +72,30 @@ def _inside(a: BoundingBox, b: BoundingBox, tol: float = 2.0) -> bool:
     )
 
 
-def _cluster_lines(lines: Iterable[RawLine], region: BoundingBox, min_length: float = 35.0):
+# Segments shorter than this are sub-pixel rendering noise, not draughting.
+# This is NOT a "how long must a boundary line be" threshold -- that check
+# happens after collinear segments are merged, in `_dominant_axis_positions`.
+_MIN_SEGMENT_LENGTH_PTS = 1.0
+
+
+def _cluster_lines(lines: Iterable[RawLine], region: BoundingBox, min_length: float = _MIN_SEGMENT_LENGTH_PTS):
+    """
+    Group axis-aligned segments inside `region` by orientation.
+
+    `min_length` deliberately admits very short segments. It used to be 35pt,
+    on the assumption that a boundary is drawn as one long stroke -- but a
+    plot boundary is conventionally drawn as a DASHED (dash-dot) property
+    line, i.e. as dozens of individually tiny segments. On PLAN5 the plot's
+    top edge is 71 separate dashes spanning 249.2pt (17.58 m at the sheet's
+    printed 1:200, matching its printed "17.59" label to 0.06%), and the
+    longest single dash is 8.9pt. The 35pt filter discarded all 71, so the
+    plot rectangle could never be reconstructed and every geometric field on
+    that plan came back MISSING.
+
+    Length is now judged on the MERGED run at each axis position rather than
+    on individual segments, which treats a dashed line and a solid line the
+    same way -- as it should, since they describe the same edge.
+    """
     horizontals: list[tuple[float, float, float]] = []  # y, x0, x1
     verticals: list[tuple[float, float, float]] = []  # x, y0, y1
     for raw in lines:
@@ -125,7 +148,21 @@ _MAX_AXIS_POSITIONS = 60
 # Minimum side length (page-points) for a reconstructed rectangle, and the
 # fraction of each side that must actually be drawn for it to count.
 _MIN_RECT_SIDE_PTS = 45.0
+# Fraction of a rectangle's side that must be inked for a SOLID edge.
 _MIN_SIDE_COVERAGE = 0.82
+
+# A dash-dot property line -- the drawing convention for a plot boundary --
+# is a real edge that is mostly gap. PLAN5's plot boundary inks only 41% of
+# its own length, so no coverage threshold that also excludes noise can
+# accept it. What distinguishes it from noise is not how much is inked but
+# WHERE: its dashes run end to end across the side, evenly, in numbers.
+#
+# A dashed side is therefore accepted when its marks SPAN essentially the
+# whole side, there are enough of them to be a pattern rather than two stray
+# ticks at the corners, and enough ink to be a drawn line at all.
+_DASHED_MIN_SPAN_FRACTION = 0.95
+_DASHED_MIN_COVERAGE = 0.30
+_DASHED_MIN_SEGMENTS = 4
 _MAX_RECT_ASPECT = 8.0
 _AXIS_SNAP_TOLERANCE_PTS = 2.0
 
@@ -144,10 +181,56 @@ def _dominant_axis_positions(
     for position, start, end in grouped:
         key = round(position, 1)
         extent_by_position[key] = extent_by_position.get(key, 0.0) + max(0.0, end - start)
+    # Now that individual dashes are admitted (see `_cluster_lines`), the
+    # "is this a real edge" test lives here, on the merged run: a position
+    # whose segments do not add up to at least the minimum rectangle side
+    # cannot form one, whether it is one stroke or fifty dashes.
+    extent_by_position = {
+        position: extent
+        for position, extent in extent_by_position.items()
+        if extent >= _MIN_RECT_SIDE_PTS
+    }
     if len(extent_by_position) <= limit:
         return sorted(extent_by_position)
     strongest = sorted(extent_by_position.items(), key=lambda kv: kv[1], reverse=True)[:limit]
     return sorted(position for position, _extent in strongest)
+
+
+def _side_span(interval_start: float, interval_end: float, segments: list[tuple[float, float]]) -> tuple[float, int]:
+    """Extent from the first to the last mark inside the interval, and how many marks."""
+    inside = [
+        (max(interval_start, a), min(interval_end, b))
+        for a, b in segments
+        if min(interval_end, b) >= max(interval_start, a)
+    ]
+    if not inside:
+        return 0.0, 0
+    return max(b for _a, b in inside) - min(a for a, _b in inside), len(inside)
+
+
+def _side_is_drawn(
+    interval_start: float, interval_end: float, segments: list[tuple[float, float]]
+) -> bool:
+    """
+    Whether a rectangle side is actually drawn, solid OR dashed.
+
+    Testing inked fraction alone cannot express this: a solid edge inks ~100%
+    of its length and a dash-dot property line inks ~40%, so any single
+    threshold either rejects real plot boundaries or accepts arbitrary
+    collinear noise.
+    """
+    side_length = interval_end - interval_start
+    if side_length <= 0:
+        return False
+    covered = _coverage(interval_start, interval_end, segments)
+    if covered >= _MIN_SIDE_COVERAGE * side_length:
+        return True
+    span, count = _side_span(interval_start, interval_end, segments)
+    return (
+        span >= _DASHED_MIN_SPAN_FRACTION * side_length
+        and covered >= _DASHED_MIN_COVERAGE * side_length
+        and count >= _DASHED_MIN_SEGMENTS
+    )
 
 
 def _rectangles_from_lines(lines: list[RawLine], region: BoundingBox) -> list[_Rect]:
@@ -180,10 +263,7 @@ def _rectangles_from_lines(lines: list[RawLine], region: BoundingBox) -> list[_R
             # this once per x-pair (rather than once per x-pair AND y-pair)
             # is what removes the quartic term: the surviving `spanning_ys`
             # list is typically a handful of entries even when `ys` is long.
-            spanning_ys = [
-                y for y in ys
-                if _coverage(x0, x1, h_segments[y]) >= _MIN_SIDE_COVERAGE * width
-            ]
+            spanning_ys = [y for y in ys if _side_is_drawn(x0, x1, h_segments[y])]
             if len(spanning_ys) < 2:
                 continue
             for j, y0 in enumerate(spanning_ys):
@@ -193,11 +273,9 @@ def _rectangles_from_lines(lines: list[RawLine], region: BoundingBox) -> list[_R
                         continue
                     if max(width / height, height / width) > _MAX_RECT_ASPECT:
                         continue
-                    left = _coverage(y0, y1, v_segments[x0])
-                    if left < _MIN_SIDE_COVERAGE * height:
+                    if not _side_is_drawn(y0, y1, v_segments[x0]):
                         continue
-                    right = _coverage(y0, y1, v_segments[x1])
-                    if right < _MIN_SIDE_COVERAGE * height:
+                    if not _side_is_drawn(y0, y1, v_segments[x1]):
                         continue
                     rects.append(
                         _Rect(BoundingBox(min_x=x0, min_y=y0, max_x=x1, max_y=y1))
@@ -246,15 +324,44 @@ _REGION_BELOW_FRACTION = 0.06
 def _site_region(anchor: RawTextItem, page_width: float, page_height: float) -> BoundingBox:
     """
     A search window around the "SITE PLAN" caption, sized relative to the
-    sheet.
+    sheet and oriented to match the caption.
 
-    The caption is printed directly beneath its drawing, so the window
-    extends much further up than down. It is deliberately only a bound on
-    the rectangle search -- which candidate rectangle is actually the plot
-    is decided afterwards by agreement with the sheet's own area statement
-    (`_score_rects`), not by this window.
+    The caption is printed alongside its drawing, so the window extends much
+    further in one direction than the other. Which direction depends on how
+    the caption is set: on a sheet laid out in landscape but stored as an
+    unrotated portrait page, the whole drawing including its captions is
+    rotated 90 degrees, and a caption that reads bottom-to-top has a tall,
+    narrow bounding box with its drawing to the SIDE rather than above.
+    PLAN5 is exactly this -- 437 of its 522 OCR items are vertical, and its
+    "SITE PLAN SCALE 1:200" caption measures 9pt wide by 147pt tall. Applying
+    the upright layout assumption there put the window over the area
+    statement table instead of the drawing.
+
+    Detecting this from the caption's own aspect ratio needs no page-rotation
+    metadata, which is important because the page reports rotation 0 -- the
+    rotation is baked into the content stream, not declared.
+
+    This is only a bound on the rectangle search. Which candidate rectangle
+    is actually the plot is decided afterwards by agreement with the sheet's
+    own area statement, not by this window.
     """
-    c = anchor.bounding_box.center
+    box = anchor.bounding_box
+    c = box.center
+    caption_is_rotated = box.height > box.width
+
+    if caption_is_rotated:
+        # The caption runs along Y, so the drawing sits to one side along X.
+        # Both X directions are searched rather than guessing the rotation
+        # sense from glyph order, which OCR does not reliably preserve.
+        along = page_height * _REGION_HALF_WIDTH_FRACTION
+        across = page_width * _REGION_ABOVE_FRACTION
+        return BoundingBox(
+            min_x=max(0.0, c.x - across),
+            min_y=max(0.0, c.y - along),
+            max_x=min(page_width, c.x + across),
+            max_y=min(page_height, c.y + along),
+        )
+
     half_width = page_width * _REGION_HALF_WIDTH_FRACTION
     return BoundingBox(
         min_x=max(0.0, c.x - half_width),
@@ -413,9 +520,28 @@ _NUM_ITEM_RE = re.compile(r"(?<![A-Za-z])(?:\d+(?:\.\d+)?|\.\d+)(?![A-Za-z])")
 # boundary minus a road-widening strip).
 _AREA_TARGET_LABELS = [
     ("plot_area_gross", re.compile(r"^AREA\s+OF\s+PLOT\s*\(\s*Minimum\s*\)", re.I)),
+    # Not every authority uses BBMP's wording. PLAN5's sheet states
+    # "SITE AREA : 160.77 Sq.m", which matched none of the patterns above,
+    # so the area cross-check had nothing to validate against and the
+    # resolver abstained on a plan whose geometry was in fact recoverable.
+    # Deliberately NOT anchored with `^`: OCR on a rotated sheet merges this
+    # label into a longer run of neighbouring text
+    # ("3 5e8340 on 00X00 SITE AREA : 160.77 Sq.m" on PLAN5), so anchoring
+    # meant it never matched on exactly the scanned plans that need it most.
+    ("plot_area_gross", re.compile(r"SITE\s+AREA\s*[:\-]", re.I)),
     ("plot_area_net", re.compile(r"^NET\s+AREA\s+OF\s+PLOT", re.I)),
     ("building_footprint_area", re.compile(r"^PROPOSED\s+COVERAGE\s+AREA", re.I)),
+    ("building_footprint_area", re.compile(r"^GROUND\s+COVERAGE\s+AREA", re.I)),
 ]
+
+# "SITE AREA : 160.77 Sq.m" -- label and value in a single text run, rather
+# than as two cells of a table. Both layouts occur on real sheets.
+# Smallest value that could be a plot or building-footprint area, in sq m.
+_MIN_PLAUSIBLE_AREA_M2 = 10.0
+
+_INLINE_AREA_VALUE_RE = re.compile(
+    r"(?P<value>\d+(?:\.\d+)?)\s*(?:sq\.?\s*m|sqm|m2|m²|smt)\b", re.I
+)
 
 
 def _area_targets(text_items: list[RawTextItem]) -> dict[str, float]:
@@ -437,15 +563,33 @@ def _area_targets(text_items: list[RawTextItem]) -> dict[str, float]:
         for label_item in ordered:
             if not pattern.search((label_item.text or "").strip()):
                 continue
-            numeric_item = _nearest_numeric_item(label_item, ordered)
-            if numeric_item is None:
+            label_text = (label_item.text or "").strip()
+            value = None
+            inline = _INLINE_AREA_VALUE_RE.search(label_text)
+            if inline:
+                try:
+                    value = float(inline.group("value"))
+                except ValueError:
+                    value = None
+            if value is None:
+                numeric_item = _nearest_numeric_item(label_item, ordered)
+                if numeric_item is None:
+                    continue
+                try:
+                    value = float(numeric_item.text.strip())
+                except ValueError:
+                    continue
+            # A plot or footprint area is never a fraction of a square metre.
+            # Without this floor, "GROUND COVERAGE AREA" on PLAN5 latched onto
+            # the neighbouring "3.00" setback cell and asserted a 3 sq.m
+            # building footprint.
+            if value < _MIN_PLAUSIBLE_AREA_M2:
+                # Keep looking: an implausible value means this label
+                # occurrence was paired with the wrong cell, not that the
+                # sheet lacks the figure. Breaking here let one bad pairing
+                # suppress a correct one later on the same sheet.
                 continue
-            try:
-                value = float(numeric_item.text.strip())
-            except ValueError:
-                continue
-            if value > 0:
-                targets[key] = value
+            targets[key] = value
             break
     return targets
 
@@ -958,15 +1102,42 @@ def extract_site_plan_measurements(
     footprint_match = _best_rect_for_area(
         nested, area_targets.get("building_footprint_area"), scale
     )
+    stated_footprint = area_targets.get("building_footprint_area")
     if footprint_match is not None:
         inner, footprint_error = footprint_match
         inner_note = (
             f"footprint rectangle reproduces the sheet's stated coverage area "
-            f"({area_targets['building_footprint_area']} sq.m) to within {footprint_error:.2%}"
+            f"({stated_footprint} sq.m) to within {footprint_error:.2%}"
+        )
+    elif nested and stated_footprint is None:
+        # No stated coverage area anywhere on the sheet, so there is nothing
+        # to tell the building footprint apart from any other nested
+        # rectangle -- a dimension frame, a hatched setback band, a parking
+        # bay. Picking the largest was a guess, and on PLAN5 it picked a
+        # rectangle spanning the full plot width and reported a 17.59 m wide
+        # building. Plot dimensions still stand on their own evidence; the
+        # building simply is not established.
+        notes.append(
+            f"{len(nested)} rectangle(s) are nested inside the resolved plot boundary, but the "
+            "sheet states no coverage area to identify which one is the building footprint. "
+            "building.width/depth and the setbacks are left unresolved rather than guessed from "
+            "the largest nested rectangle."
         )
     elif nested:
-        inner = max(nested, key=lambda r: r.area)
-        inner_note = "largest rectangle nested inside the plot boundary (no stated coverage area to confirm it against)"
+        # The sheet DOES state a coverage area, and no nested rectangle
+        # reproduces it. Falling back to "largest nested rectangle" here
+        # asserts a footprint the document actively contradicts: on PLAN5
+        # that picked a rectangle spanning the full plot width, giving a
+        # building 17.59 m wide against a stated 93.46 sq.m footprint, and
+        # dragged all four setbacks wrong with it. Confirming the PLOT does
+        # not confirm the BUILDING -- they are separate rectangles and need
+        # separate evidence.
+        notes.append(
+            f"the plot boundary was resolved, but no nested rectangle reproduces the sheet's "
+            f"stated coverage area ({stated_footprint} sq.m) within "
+            f"{_AREA_MATCH_TOLERANCE:.0%}. building.width/depth and the setbacks are left "
+            "unresolved rather than derived from a footprint the document contradicts."
+        )
 
     # Everything below is measured relative to the plot rectangle, so it
     # inherits that rectangle's confirmation status. A nested rectangle that
